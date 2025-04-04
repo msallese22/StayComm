@@ -1,0 +1,38 @@
+.new{
+  font-size: 32px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.top-row{
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.tiny-rectangles{
+  height: 95px;
+  width: 275px;
+}
+
+.check-in{
+  border: solid 6px #7ed957;
+}
+
+.check-out{
+  border: solid 6px #ff69b1;
+}
+
+.guest-info{
+  height: 205px;
+  width: 445px;
+  border: solid 6px #ec8fd0;
+}
+
+.bottom-row{
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+}
