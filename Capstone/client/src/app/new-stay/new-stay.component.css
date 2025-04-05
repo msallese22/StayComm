@@ -9,20 +9,36 @@
 .top-row{
   display:flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
 }
 
 .tiny-rectangles{
-  height: 95px;
-  width: 275px;
+  height: 85px;
+  width: 225px;
+  display: flex;
+  flex-direction: column;
+}
+.tiny-rectangles p{
+  margin: 0 0 0 10px;
+}
+
+.calendar-date{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
 }
 
 .check-in{
   border: solid 6px #7ed957;
+  margin-left: 22px;
 }
 
 .check-out{
   border: solid 6px #ff69b1;
+  margin-left: 22px;
+
 }
 
 .guest-info{
@@ -34,5 +50,79 @@
 .bottom-row{
   display:flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+}
+
+.mat-icon{
+  width: 45px !important;
+  height: 45px !important;
+  font-size: 45px;
+  margin-right: 35px;
+  margin-top: 10px;
+}
+
+.info{
+  font-size: 25px !important;
+  position: absolute;
+  bottom: -20px;
+  right: -45px;
+}
+
+.room-type{
+  border: solid 6px #e086c2;
+  height: 170px;
+  width: 270px;
+  text-align: center;
+  position: relative;
+
+}
+
+.rate{
+  border: solid 6px #ff69b1;
+  height: 170px;
+  width: 270px;
+  text-align: center;
+  position: relative;
+}
+
+
+.rate-ception{
+  border: solid 3px #7ed957;
+  height: 70px;
+  width: 215px;
+  margin: 40px 27px 10px 27px;
+}
+
+.credit-card{
+  height: 205px;
+  width: 445px;
+  border: solid 6px #7ed957;
+}
+
+.king{
+  margin-top: 20px;
+  background-color: #7ed957 !important;
+  color: white !important;
+}
+
+.queen{
+  margin-top: 20px;
+  background-color: #ec8fd0 !important;
+  color: white !important;
+}
+
+.book{
+  background: linear-gradient(to left
+  , #fff7ad, #ffa9f9);
+  color: #4b2141 !important;
+  width: 40%;
+
+}
+
+.book-container{
+  display: flex;
   justify-content: center;
+  margin-top: 25px;
 }

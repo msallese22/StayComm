@@ -56,3 +56,8 @@
 .upcoming{
   border: 10px solid #ff69b1;
 }
+
+.book-link:hover{
+  cursor: pointer;
+  text-after-overflow: underline;
+}
