@@ -1,16 +1,14 @@
 <div class="home-container">
   <div class="welcome">Welcome, [Guest_FName] [Guest_LName]</div>
   <div class="square-container">
-    <div class="book square-shapes">
-      <router-outlet routerLinkActive routerLink="/new-stay" class="book-link">Book a New Stay</router-outlet>
-    </div>
-
-    <div class="gradient-box square-shapes">
+    <a routerLinkActive routerLink="/new-stay" class="book square-shapes">
+      Book a New Stay
+    </a>
+    <a class="gradient-box square-shapes">
       Your Current Stay
-    </div>
-
-    <div class="upcoming square-shapes">
+    </a>
+    <a class="upcoming square-shapes">
       Your Upcoming Stays
-    </div>
+    </a>
   </div>
 </div>

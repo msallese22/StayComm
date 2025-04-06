@@ -24,9 +24,17 @@
   align-items: center;
   margin: auto;
   justify-content: center;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
-.book{
+
+.book {
   border: 10px solid #7ed957;
+}
+
+.square-shapes:hover{
+  text-decoration: underline;
 }
 
 .gradient-box {
@@ -57,7 +65,3 @@
   border: 10px solid #ff69b1;
 }
 
-.book-link:hover{
-  cursor: pointer;
-  text-after-overflow: underline;
-}
