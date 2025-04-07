@@ -1,0 +1,16 @@
+@if(data.isCreate){
+  <h1 mat-dialog-title>Thank you!</h1>
+<h2>Your Stay has been Booked</h2>
+}
+@else{
+  <h1 mat-dialog-title>Thank you!</h1>
+  <h2>Your Stay has been Updated</h2>
+}
+<mat-dialog-content><p>[check-in-date] [check-out-date]</p>
+<p>[room-type]</p>
+  <p>[stay-id]</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Continue</button>
+</mat-dialog-actions>

@@ -5,16 +5,16 @@
   <div class="top-row">
     <div class="check-in tiny-rectangles">
       <div class="calendar-date">
-      <p>Check-in Date</p>
-      <mat-icon class="material-symbols-outlined">calendar_month</mat-icon>
+        <p>Check-in Date</p>
+        <mat-icon class="material-symbols-outlined">calendar_month</mat-icon>
       </div>
       <p>MM/DD/YYYY</p>
 
     </div>
     <div class="check-out tiny-rectangles">
       <div class="calendar-date">
-      <p>Check-out Date</p>
-      <mat-icon class="material-symbols-outlined bigger-calendar">calendar_month</mat-icon>
+        <p>Check-out Date</p>
+        <mat-icon class="material-symbols-outlined bigger-calendar">calendar_month</mat-icon>
       </div>
       <p>MM/DD/YYYY</p>
     </div>
@@ -46,6 +46,6 @@
     </div>
   </div>
   <div class="book-container">
-  <button mat-raised-button class="book">Book</button>
+    <button mat-raised-button class="book" (click)="openDialog()">Book</button>
   </div>
 </div>
