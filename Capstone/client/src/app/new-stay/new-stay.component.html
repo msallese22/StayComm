@@ -2,50 +2,88 @@
   <div class="new">
     Book a New Stay
   </div>
-  <div class="top-row">
-    <div class="check-in tiny-rectangles">
-      <div class="calendar-date">
-        <p>Check-in Date</p>
-        <mat-icon class="material-symbols-outlined">calendar_month</mat-icon>
-      </div>
-      <p>MM/DD/YYYY</p>
+  <form [formGroup]="newStayForm">
+    <div class="top-row">
+      <div class="check-in tiny-rectangles">
+        <div class="calendar-date">
+          <mat-form-field>
+            <mat-label>Check In Date</mat-label>
+            <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="checkInPicker"
+                   formControlName="checkInDate"/>
+            <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+            <mat-datepicker #checkInPicker></mat-datepicker>
+          </mat-form-field>
 
-    </div>
-    <div class="check-out tiny-rectangles">
-      <div class="calendar-date">
-        <p>Check-out Date</p>
-        <mat-icon class="material-symbols-outlined bigger-calendar">calendar_month</mat-icon>
+        </div>
       </div>
-      <p>MM/DD/YYYY</p>
+      <div class="check-out tiny-rectangles">
+        <div class="calendar-date">
+        </div>
+        <mat-form-field>
+          <mat-label>Check Out Date</mat-label>
+          <input matInput [min]="checkOutMinDate" [max]="maxDate" [matDatepicker]="checkOutPicker"
+                 formControlName="checkOutDate"/>
+          <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+          <mat-datepicker #checkOutPicker></mat-datepicker>
+        </mat-form-field>
+
+      </div>
+      <div class="guest-info" [formGroup]="guestInfoFormGroup">
+        <div class="style-guest-name">
+          <mat-form-field appearance="outline">
+            <mat-label>Guest First Name</mat-label>
+            <input formControlName="guestFirstName" matInput>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Guest Last Name</mat-label>
+            <input formControlName="guestLastName" matInput>
+          </mat-form-field>
+        </div>
+        <div class="style-guest-info">
+          <mat-form-field appearance="outline">
+            <mat-label>Guest Phone Number</mat-label>
+            <input formControlName="guestPhone" matInput>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Guest Email Address</mat-label>
+            <input formControlName="guestEmail" matInput>
+          </mat-form-field>
+        </div>
+      </div>
     </div>
-    <div class="guest-info">
-      <p>Guest's First Name:</p>
-      <p>Guest's Last Name:</p>
-      <p>Guest email:</p>
-      <p>Guest phone:</p>
-      <p>Notes:</p>
+    <div class="bottom-row">
+      <div class="room-type">
+        <p>Select A Room Type</p>
+        <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('King')">King Suite</button>
+        <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('King')">Queen Suite</button>
+        @if(king===true){<p>You've selected a King Suite</p>}
+        @else{<p>You've selected a Queen Suite</p>}
+        <mat-icon class="info">info</mat-icon>
+      </div>
+      <div class="rate">
+        <p>Confirm Rate</p>
+        <div class="rate-ception"><p>$$$</p></div>
+        <mat-icon class="material-symbols-outlined info">info</mat-icon>
+      </div>
+      <div class="credit-card" [formGroup]="creditCardInfoFormGroup">
+        <div class="style-credit-card">
+        <mat-form-field appearance="outline">
+          <mat-label>Credit Card Number:</mat-label>
+          <input formControlName="creditCardNumber" matInput placeholder="XXXX-XXXX-XXXX-XXXX">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Exp:</mat-label>
+          <input formControlName="creditCardExp" matInput placeholder="MM/YYYY">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>CVV:</mat-label>
+          <input formControlName="creditCardCVV" matInput placeholder="XXX or XXXX">
+        </mat-form-field>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="bottom-row">
-    <div class="room-type">
-      <p>Select A Room Type</p>
-      <button mat-raised-button class="king">King Suite</button>
-      <button mat-raised-button class="queen">Queen Suite</button>
-      <mat-icon class="info">info</mat-icon>
+    <div class="book-container">
+      <button mat-raised-button class="book" (click)="openDialog()">Book</button>
     </div>
-    <div class="rate">
-      <p>Confirm Rate</p>
-      <div class="rate-ception"><p>$$$</p></div>
-      <mat-icon class="material-symbols-outlined info">info</mat-icon>
-    </div>
-    <div class="credit-card">
-      <p>Add a Credit Card</p>
-      <p>Card Number:</p>
-      <p>Exp:</p>
-      <p>CVV:</p>
-    </div>
-  </div>
-  <div class="book-container">
-    <button mat-raised-button class="book" (click)="openDialog()">Book</button>
-  </div>
+  </form>
 </div>

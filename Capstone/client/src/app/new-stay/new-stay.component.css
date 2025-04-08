@@ -19,10 +19,9 @@
   width: 225px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
-.tiny-rectangles p{
-  margin: 0 0 0 10px;
-}
+
 
 .calendar-date{
   display: flex;
@@ -42,7 +41,7 @@
 }
 
 .guest-info{
-  height: 205px;
+  height: 220px;
   width: 445px;
   border: solid 6px #ec8fd0;
 }
@@ -96,7 +95,7 @@
 }
 
 .credit-card{
-  height: 205px;
+  height: 220px;
   width: 445px;
   border: solid 6px #7ed957;
 }
@@ -113,6 +112,16 @@
   color: white !important;
 }
 
+.queen:disabled{
+  background-color: #7c7578 !important;
+  color: white; !important;
+}
+
+.king:disabled{
+  background-color: #7c7578 !important;
+  color: white; !important;
+}
+
 .book{
   background: linear-gradient(to left
   , #fff7ad, #ffa9f9);
@@ -125,4 +134,27 @@
   display: flex;
   justify-content: center;
   margin-top: 25px;
+}
+
+.style-guest-name{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.style-guest-info{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.style-credit-card{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 30px;
+  margin-left: 30px;
+  margin-top: 5px;
 }
