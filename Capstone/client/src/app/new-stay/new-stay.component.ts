@@ -4,10 +4,11 @@ import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
 import {SaveStayDetailsModalComponent} from '../shared/save-stay-details-modal/save-stay-details-modal.component';
 import {Router} from '@angular/router';
-import {MatFormField, MatHint, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
+import {MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
 import {provideNativeDateAdapter} from '@angular/material/core';
+import { CreditCardPipe } from '../credit-card.pipe';
 
 @Component({
   selector: 'app-new-stay',
@@ -21,7 +22,8 @@ import {provideNativeDateAdapter} from '@angular/material/core';
     MatSuffix,
     MatDatepickerInput,
     MatDatepicker,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CreditCardPipe
   ],
   templateUrl: './new-stay.component.html',
   providers: [provideNativeDateAdapter()],
@@ -89,4 +91,6 @@ export class NewStayComponent
       this.router.navigateByUrl("/home");
     });
   }
+
+
 }

@@ -5,5 +5,6 @@
     </a>
   </div>
   <h3 class="staycomm">StayComm</h3>
-  <h6 class="user-type">Guest</h6>
+ @if(isGuest){<h6 class="user-type">Guest</h6>}
+  @else{<h6 class="user-type">Agent</h6>}
 </div>
