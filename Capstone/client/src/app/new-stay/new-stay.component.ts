@@ -4,11 +4,12 @@ import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
 import {SaveStayDetailsModalComponent} from '../shared/save-stay-details-modal/save-stay-details-modal.component';
 import {Router} from '@angular/router';
-import {MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
+import {MatError, MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import { CreditCardPipe } from '../credit-card.pipe';
+import {consumerMarkDirty} from '@angular/core/primitives/signals';
 
 @Component({
   selector: 'app-new-stay',
@@ -22,6 +23,7 @@ import { CreditCardPipe } from '../credit-card.pipe';
     MatSuffix,
     MatDatepickerInput,
     MatDatepicker,
+    MatError,
     ReactiveFormsModule,
     CreditCardPipe
   ],
@@ -39,7 +41,8 @@ export class NewStayComponent
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
   readonly checkOutMinDate = new Date(this.minDate.getFullYear(), this.minDate.getMonth(), this.minDate.getDay() + 1);
 
-  king?: boolean | null = null;
+  king?: boolean | null = true;
+  queen?: boolean | null = false;
 
 
   newStayForm = new FormGroup({
@@ -70,11 +73,16 @@ export class NewStayComponent
     return this.newStayForm.get('creditCardInfoForm') as FormGroup;
   }
 
+
+//returns if King RoomType or Queen RoomType has been selected. RoomType is set to null before a selection is made
+  //
   setRoomType(roomType: string)
   {
     this.newStayForm.get("roomType")?.setValue(roomType);
 
     this.king=!this.king;
+
+    this.queen=!this.queen;
 
   }
 
@@ -93,4 +101,5 @@ export class NewStayComponent
   }
 
 
+  protected readonly consumerMarkDirty = consumerMarkDirty;
 }

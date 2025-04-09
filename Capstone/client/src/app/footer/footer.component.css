@@ -1,0 +1,12 @@
+.footer{
+  width: 100%;
+  height: 25px;
+  background-color: #ec8fd0;
+  margin-top: 25px;
+}
+
+.copyright{
+  display: flex;
+  justify-content: center;
+  color: #4b2141;
+}

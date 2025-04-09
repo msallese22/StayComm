@@ -41,7 +41,7 @@
 }
 
 .guest-info{
-  height: 220px;
+  height: 230px;
   width: 445px;
   border: solid 6px #ec8fd0;
 }
@@ -95,14 +95,14 @@
 }
 
 .credit-card{
-  height: 220px;
+  height: 230px;
   width: 445px;
   border: solid 6px #7ed957;
 }
 
 .king{
   margin-top: 20px;
-  background-color: #7ed957 !important;
+  background-color: #8ede6c !important;
   color: white !important;
 }
 
@@ -113,12 +113,12 @@
 }
 
 .queen:disabled{
-  background-color: #7c7578 !important;
+  background-color: #e14eb5 !important;
   color: white; !important;
 }
 
 .king:disabled{
-  background-color: #7c7578 !important;
+  background-color: #55ba2a !important;
   color: white; !important;
 }
 
