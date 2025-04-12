@@ -114,12 +114,12 @@
 
 .queen:disabled{
   background-color: #e14eb5 !important;
-  color: white; !important;
+  color: white !important;
 }
 
 .king:disabled{
   background-color: #55ba2a !important;
-  color: white; !important;
+  color: white !important;
 }
 
 .book{
@@ -127,7 +127,10 @@
   , #fff7ad, #ffa9f9);
   color: #4b2141 !important;
   width: 40%;
+}
 
+.book:disabled{
+  background: #c5bcbf !important;
 }
 
 .book-container{

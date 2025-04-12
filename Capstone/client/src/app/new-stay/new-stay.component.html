@@ -46,8 +46,13 @@
           <div class="style-guest-info">
             <mat-form-field appearance="outline">
               <mat-label>Guest Phone Number</mat-label>
-              <input formControlName="guestPhone" matInput required minlength="10" maxlength="10">
-              <mat-error>A Phone Number is required</mat-error>
+              <input formControlName="guestPhone" matInput [mask]="'(000)000-0000'">
+              @if(guestInfoFormGroup.get("guestPhone")?.hasError("required"))
+              {<mat-error>A Phone Number is required</mat-error>}
+              @if(guestInfoFormGroup.get("guestPhone")?.hasError("minlength"))
+              {<mat-error>Phone number is invalid. Not long enough.</mat-error>}
+              @if(guestInfoFormGroup.get("guestPhone")?.hasError("maxlength"))
+              {<mat-error>Phone number is invalid. Too long.</mat-error>}
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Guest Email Address</mat-label>
@@ -62,12 +67,12 @@
           <p>Select A Room Type</p>
           <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('King')">King Suite
           </button>
-          <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('King')">Queen Suite
+          <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('Queen')">Queen Suite
           </button>
-          @if (king) {
+          @if (king===true) {
             <p>You've selected a King Suite</p>
           }
-          @if (queen) {
+          @if (king===false) {
             <p>You've selected a Queen Suite</p>
           } @else {
             <p></p>
@@ -84,25 +89,35 @@
             <mat-form-field appearance="outline">
               <mat-label>Credit Card Number:</mat-label>
               <input formControlName="creditCardNumber" matInput placeholder="XXXX-XXXX-XXXX-XXXX"
-                     required minlength="15" maxlength="16">
-              <mat-error>A Credit Card Number is required</mat-error>
+                     required [mask]="'AAAA-AAAA-AAAA-AAAA'">
+             @if(creditCardInfoFormGroup.get("creditCardNumber")?.hasError("required"))
+             {<mat-error>A Credit Card Number is required</mat-error>}
+              @if(creditCardInfoFormGroup.get("creditCardNumber")?.hasError("minlength"))
+              {<mat-error>Credit Card Number Length is invalid. Not long enough.</mat-error>}
+              @if(creditCardInfoFormGroup.get("creditCardNumber")?.hasError("maxlength"))
+              {<mat-error>Credit Card Number Length is invalid. Too long.</mat-error>}
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Exp:</mat-label>
-              <input formControlName="creditCardExp" matInput placeholder="MM/YYYY" required>
+              <input formControlName="creditCardExp" matInput placeholder="MM/YYYY" [mask]="'00/0000'" required>
               <mat-error>A Credit Card Expiration Date is required</mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>CVV:</mat-label>
               <input formControlName="creditCardCVV" matInput placeholder="XXX or XXXX" required minlength="3"
                      maxlength="4">
-              <mat-error>A Credit Card CVV is required</mat-error>
+              @if(creditCardInfoFormGroup.get("creditCardCVV")?.hasError("required"))
+              {<mat-error>A Credit Card CVV is required</mat-error>}
+              @if(creditCardInfoFormGroup.get("creditCardCVV")?.hasError("minlength"))
+              {<mat-error>Credit Card CVV Length is invalid. Not long enough.</mat-error>}
+              @if(creditCardInfoFormGroup.get("creditCardCVV")?.hasError("maxlength"))
+              {<mat-error>Credit Card CVV Length is invalid. Too long.</mat-error>}
             </mat-form-field>
           </div>
         </div>
       </div>
       <div class="book-container">
-  <button mat-raised-button class="book" (click)="openDialog()">Book</button>
+  <button mat-raised-button class="book" (click)="openDialog()" [disabled]="newStayFormInvalid">Book</button>
 </div>
 </form>
 </div>

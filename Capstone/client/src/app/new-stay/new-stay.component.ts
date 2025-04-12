@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
@@ -6,10 +6,9 @@ import {SaveStayDetailsModalComponent} from '../shared/save-stay-details-modal/s
 import {Router} from '@angular/router';
 import {MatError, MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {provideNativeDateAdapter} from '@angular/material/core';
-import { CreditCardPipe } from '../credit-card.pipe';
-import {consumerMarkDirty} from '@angular/core/primitives/signals';
+import {NgxMaskDirective} from 'ngx-mask';
 
 @Component({
   selector: 'app-new-stay',
@@ -25,14 +24,14 @@ import {consumerMarkDirty} from '@angular/core/primitives/signals';
     MatDatepicker,
     MatError,
     ReactiveFormsModule,
-    CreditCardPipe
+    NgxMaskDirective
   ],
   templateUrl: './new-stay.component.html',
   providers: [provideNativeDateAdapter()],
   standalone: true,
   styleUrl: './new-stay.component.css'
 })
-export class NewStayComponent
+export class NewStayComponent implements OnInit
 {
   dialog = inject(MatDialog);
   router = inject(Router);
@@ -41,25 +40,24 @@ export class NewStayComponent
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
   readonly checkOutMinDate = new Date(this.minDate.getFullYear(), this.minDate.getMonth(), this.minDate.getDay() + 1);
 
-  king?: boolean | null = true;
-  queen?: boolean | null = false;
+  king?: boolean | null = null;
 
 
   newStayForm = new FormGroup({
-    checkInDate: new FormControl(''),
-    checkOutDate: new FormControl(''),
+    checkInDate: new FormControl('', [Validators.required]),
+    checkOutDate: new FormControl('',[Validators.required]),
     guestInfoForm: new FormGroup({
-      guestFirstName: new FormControl(''),
-      guestLastName: new FormControl(''),
-      guestPhone: new FormControl(''),
-      guestEmail: new FormControl(''),
+      guestFirstName: new FormControl('', [Validators.required]),
+      guestLastName: new FormControl('', [Validators.required]),
+      guestPhone: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]),
+      guestEmail: new FormControl('' , [Validators.required]),
       guestNotes: new FormControl('')
     }),
     roomType: new FormControl(''),
     creditCardInfoForm: new FormGroup({
-      creditCardNumber: new FormControl(''),
-      creditCardExp: new FormControl(''),
-      creditCardCVV: new FormControl('')
+      creditCardNumber: new FormControl('', [Validators.minLength(16), Validators.maxLength(16), Validators.required]),
+      creditCardExp: new FormControl('', [Validators.required, Validators.maxLength(6), Validators.minLength(6)]),
+      creditCardCVV: new FormControl('',[Validators.required, Validators.minLength(3), Validators.maxLength(4)])
     })
   });
 
@@ -73,6 +71,24 @@ export class NewStayComponent
     return this.newStayForm.get('creditCardInfoForm') as FormGroup;
   }
 
+  get newStayFormInvalid()
+  {
+    return this.newStayForm.invalid;
+  }
+
+  ngOnInit(): void
+  {
+      this.creditCardInfoFormGroup.get("creditCardNumber")?.valueChanges.subscribe(value => {
+
+        if(value.length === 16)
+        {
+          const lastFour = value.substring(12);
+          const abstractedNumbers = "XXXXXXXXXXXX" + lastFour;
+          this.creditCardInfoFormGroup.get("creditCardNumber")?.setValue(abstractedNumbers, {emitEvent : false})
+        }
+      })
+  }
+
 
 //returns if King RoomType or Queen RoomType has been selected. RoomType is set to null before a selection is made
   //
@@ -80,10 +96,7 @@ export class NewStayComponent
   {
     this.newStayForm.get("roomType")?.setValue(roomType);
 
-    this.king=!this.king;
-
-    this.queen=!this.queen;
-
+    this.king = roomType === 'King';
   }
 
   openDialog()
@@ -99,7 +112,4 @@ export class NewStayComponent
       this.router.navigateByUrl("/home");
     });
   }
-
-
-  protected readonly consumerMarkDirty = consumerMarkDirty;
 }
