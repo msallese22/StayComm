@@ -1,12 +1,13 @@
 import {Component, inject} from '@angular/core';
 import {
-  MAT_DIALOG_DATA,
+  MAT_DIALOG_DATA, MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
   MatDialogTitle
 } from '@angular/material/dialog';
 import {MatButton} from '@angular/material/button';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-save-stay-details-modal',
@@ -15,7 +16,8 @@ import {MatButton} from '@angular/material/button';
     MatDialogTitle,
     MatDialogActions,
     MatButton,
-    MatDialogClose
+    MatDialogClose,
+    DatePipe
   ],
   templateUrl: './save-stay-details-modal.component.html',
   standalone: true,
@@ -24,4 +26,6 @@ import {MatButton} from '@angular/material/button';
 export class SaveStayDetailsModalComponent
 {
   data = inject(MAT_DIALOG_DATA);
+
+
 }

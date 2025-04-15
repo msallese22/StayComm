@@ -2,3 +2,13 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: "Open Sans", sans-serif; }
+
+.style-modal{
+  opacity: 96%;
+  display: flex;
+  justify-content: center;
+}
+
+.mat-mdc-dialog-surface{
+  background-color: #eaaed6 !important;
+}
