@@ -10,5 +10,5 @@ import {EmpHomeComponent} from './emp-home/emp-home.component';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  isGuest:boolean = false;
+  isGuest:boolean = true;
 }
