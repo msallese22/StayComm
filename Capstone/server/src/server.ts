@@ -25,4 +25,26 @@ app.listen(port, () =>
 AppDataSource.initialize()//initializing where the database is to go!
     .then(() =>
     {
+        const d = new Date();
+        const dateObject = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
         console.log("Data source has been initialized!");
+        app.get('/stay/departures', async (req, res) =>
+        {
+            //then we tell it "hey, wait for us to tell you the query. the query type is findOneBy and then the productCode's id
+            const departureCount = await AppDataSource.getRepository(Stay).findAndCount({
+                where: {stayCheckoutDate: dateObject}
+            });
+            if (!departureCount)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `No departures for today found :(`
+                })
+            }
+            else
+            {
+                res.json(departureCount[1]);//send the product as a json response.
+            }
+        });
+    })

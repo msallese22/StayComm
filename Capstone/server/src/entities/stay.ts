@@ -2,7 +2,7 @@ export { Stay }
 
 import {Column, Entity, PrimaryColumn } from "typeorm";
 
-@Entity("Stay")
+@Entity("STAY")
 
 class Stay
 {
