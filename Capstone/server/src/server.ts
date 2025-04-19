@@ -47,4 +47,22 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(departureCount[1]);//send the product as a json response.
             }
         });
-    })
+        app.get('/stay/arrivals', async (req, res) =>
+        {
+            //then we tell it "hey, wait for us to tell you the query. the query type is findOneBy and then the productCode's id
+            const arrivalCount = await AppDataSource.getRepository(Stay).findAndCount({
+                where: {stayCheckinDate: dateObject}
+            });
+            if (!arrivalCount)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `No arrivals for today found :(`
+                })
+            }
+            else
+            {
+                res.json(arrivalCount[1]);//send the product as a json response.
+            }
+        });
+    });

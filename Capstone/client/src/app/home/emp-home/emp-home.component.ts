@@ -24,6 +24,7 @@ import {StayService} from '../../services/stay/stay.service';
 export class EmpHomeComponent implements OnInit{
 
   departureCount = 0;
+  arrivalCount = 0;
 
   private stayService = inject(StayService)
   ngOnInit()
@@ -31,5 +32,9 @@ export class EmpHomeComponent implements OnInit{
     this.stayService.getDepartureCount().subscribe(count => {
       this.departureCount = count;
     });
+
+    this.stayService.getArrivalCount().subscribe(count => {
+      this.arrivalCount = count;
+    })
   }
 }

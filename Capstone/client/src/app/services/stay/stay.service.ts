@@ -13,4 +13,9 @@ export class StayService {
   {
     return this.http.get<number>(`${this.url}/stay/departures`);
   }
+
+  getArrivalCount(): Observable<number>
+  {
+    return this.http.get<number>(`${this.url}/stay/arrivals`);
+  }
 }
