@@ -1,6 +1,8 @@
+import {Stay} from "./stay";
+
 export { Guest }
 
-import {Column, Entity, PrimaryColumn } from "typeorm";
+import {Column, Entity, OneToMany, PrimaryColumn, Relation} from "typeorm";
 
 @Entity("GUEST")
 
@@ -23,4 +25,8 @@ class Guest
 
     @Column({name: 'GUEST_PASSWORD', type: 'varchar', length: 64})
     guestPassword!: string;
+
+    @OneToMany(() => Stay, stay => stay.guest)
+    stays!: Stay;
+
 }

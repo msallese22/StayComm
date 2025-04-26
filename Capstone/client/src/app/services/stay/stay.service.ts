@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {StayInfo} from '../../models/stay-info';
 
 @Injectable({
   providedIn: 'root'
@@ -18,4 +19,10 @@ export class StayService {
   {
     return this.http.get<number>(`${this.url}/stay/arrivals`);
   }
+
+  getArrivalInfo()
+  {
+    return this.http.get<StayInfo[]>(`${this.url}/stay/today-arrivals`);
+  }
+
 }

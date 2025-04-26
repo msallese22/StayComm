@@ -1,6 +1,9 @@
+import {type} from "node:os";
+
 export { Stay }
 
-import {Column, Entity, PrimaryColumn } from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn} from "typeorm";
+import { Guest } from "./guest";
 
 @Entity("STAY")
 
@@ -18,7 +21,8 @@ class Stay
     @Column({name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
 
-    @Column({name: 'GUEST_ID', type: 'int', unsigned: true})
-    guestId!: number;
-
+    @ManyToOne(() => Guest, guest => guest.stays)
+    @JoinColumn({name: 'GUEST_ID'})
+    guest!: Guest;
+    //creates a new type, fixes the circular dependency wowowowow
 }
