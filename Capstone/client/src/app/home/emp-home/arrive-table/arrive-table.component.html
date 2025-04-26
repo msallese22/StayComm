@@ -7,31 +7,31 @@
   <table mat-table [dataSource]="dataSource" matSort>
 
     <!-- guest name column -->
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="guestLname">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Guest Name </th>
       <td mat-cell *matCellDef="let row"> {{row.guest.guestLname}}, {{row.guest.guestFname}} </td>
     </ng-container>
 
     <!-- check in date -->
-    <ng-container matColumnDef="checkin-date">
+    <ng-container matColumnDef="stayCheckinDate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Check-in Date </th>
       <td mat-cell *matCellDef="let row"> {{row.stayCheckinDate}} </td>
     </ng-container>
 
     <!-- check out date -->
-    <ng-container matColumnDef="checkout-date">
+    <ng-container matColumnDef="stayCheckoutDate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Check-out Date </th>
       <td mat-cell *matCellDef="let row"> {{row.stayCheckoutDate}} </td>
     </ng-container>
 
     <!-- room number -->
-    <ng-container matColumnDef="room-id">
+    <ng-container matColumnDef="roomId">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Room Number </th>
       <td mat-cell *matCellDef="let row"> {{row.roomId}} </td>
     </ng-container>
 
     <!-- stay id -->
-    <ng-container matColumnDef="stay-id">
+    <ng-container matColumnDef="stayId">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Stay ID </th>
       <td mat-cell *matCellDef="let row"> {{row.stayId}} </td>
     </ng-container>

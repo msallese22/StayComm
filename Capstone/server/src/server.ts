@@ -82,4 +82,25 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(arrivingArrivals);//send the product as a json response.
             }
         })// find the arrival data where stayCheckinDate = today. make variable that holds today data?
+        app.get('/stay/today-departures', async(req, res) => {
+            const departingDepartures = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .innerJoinAndSelect("stay.guest", "guest")
+                .where("stay.stayCheckoutDate = :today", {today: dateObject})
+                .getMany();
+            if (!departingDepartures)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `No departures for today found :(`
+                })
+            }
+            else
+            {
+                res.json(departingDepartures);//send the product as a json response.
+            }
+        })
+        app.get('/room/room-status', async(req, res) => {
+            const roomStatus = await AppDataSource.getRepository(Room).find();
+            res.json(roomStatus);
+        })
     });

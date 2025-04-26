@@ -1,6 +1,8 @@
+
 export { Room }
 
-import {Column, Entity, PrimaryColumn } from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn} from "typeorm";
+import {Stay} from "./stay";
 
 @Entity("ROOM")
 
@@ -18,9 +20,13 @@ class Room
     @Column({ name: 'ROOM_IS_BLOCKED', type: 'boolean'})
     roomIsBlocked!: boolean;
 
-    @Column({name: 'STAY_ID', type: 'int', nullable: true, unsigned: true})
-    stayId!: number | null;
-
     @Column({ name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
+
+
+    @ManyToOne(() => Stay, stay => stay.room)
+    @JoinColumn({name: 'STAY_ID'})
+    stays!: Stay;
+
+
 }

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ArriveDepartTableComponent } from './arrive-depart-table.component';
+import { ArriveDepartTableComponent } from './arrive-table.component';
 
 describe('ArriveDepartTableComponent', () => {
   let component: ArriveDepartTableComponent;

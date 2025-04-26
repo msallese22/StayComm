@@ -25,4 +25,9 @@ export class StayService {
     return this.http.get<StayInfo[]>(`${this.url}/stay/today-arrivals`);
   }
 
+  getDepartureInfo()
+  {
+    return this.http.get<StayInfo[]>(`${this.url}/stay/today-departures`);
+  }
+
 }

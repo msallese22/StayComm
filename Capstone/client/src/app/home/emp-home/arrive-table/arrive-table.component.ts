@@ -3,43 +3,60 @@ import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {StayInfo} from '../../models/stay-info';
-import {StayService} from '../../services/stay/stay.service';
+import {StayInfo} from '../../../models/stay-info';
+import {StayService} from '../../../services/stay/stay.service';
 
 @Component({
-  selector: 'app-arrive-depart-table',
-  styleUrl: 'arrive-depart-table.component.css',
-  templateUrl: 'arrive-depart-table.component.html',
+  selector: 'app-arrive-table',
+  styleUrl: 'arrive-table.component.css',
+  templateUrl: 'arrive-table.component.html',
   imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule],
   standalone: true
 })
-export class ArriveDepartTableComponent implements AfterViewInit, OnInit {
-  displayedColumns: string[] = ['name', 'stay-id', 'room-id', 'checkin-date', 'checkout-date'];
+export class ArriveTableComponent implements AfterViewInit, OnInit
+{
+  displayedColumns: string[] = ['guestLname', 'stayId', 'roomId', 'stayCheckinDate', 'stayCheckoutDate'];
   dataSource: MatTableDataSource<StayInfo>;
 
   @ViewChild(MatSort) sort!: MatSort;
 
   private stayService = inject(StayService);
-  constructor() {
+
+  constructor()
+  {
 
     this.dataSource = new MatTableDataSource();
   }
 
   ngOnInit()
   {
-    this.stayService.getArrivalInfo().subscribe(arrivers => {
+    this.dataSource.filterPredicate = (data: StayInfo, filter: string) =>
+    {
+      console.log(filter);
+      const stringStayId = `${data.stayId}`;
+      return data.guest.guestLname.toLowerCase().includes(filter) ||
+        stringStayId.includes(filter);
+    }
+    this.stayService.getArrivalInfo().subscribe(arrivers =>
+    {
       this.dataSource.data = arrivers;
+
     });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit()
+  {
     this.dataSource.sort = this.sort;
   }
 
-  applyFilter(event: Event) {
+
+
+
+  applyFilter(event: Event)
+  {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-    
+
   }
 }
 
