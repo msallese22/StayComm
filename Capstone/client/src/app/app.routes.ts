@@ -5,6 +5,7 @@ import {NewStayComponent} from './new-stay/new-stay.component';
 import {DepartTableComponent} from './home/emp-home/depart-table/depart-table.component';
 
 import {ArriveTableComponent} from './home/emp-home/arrive-table/arrive-table.component';
+import {ManageRoomStatusComponent} from './home/emp-home/manage-room-status/manage-room-status.component';
 
 export const routes: Routes = [
   {
@@ -21,6 +22,9 @@ export const routes: Routes = [
   },
   {
     path: "today-departures", component: DepartTableComponent
+  },
+  {
+    path: "room-status", component: ManageRoomStatusComponent
   },
   {
     path:"", component: HomeComponent
