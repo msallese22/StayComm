@@ -1,0 +1,14 @@
+.mat-button-toggle-group{
+  white-space: preserve;
+}
+
+.roomIsClean-text{
+
+}
+
+.save-button{
+  background: linear-gradient(to left
+  , #fff7ad, #ffa9f9);
+  color: #4b2141 !important;
+  width: 20%;
+}

@@ -65,7 +65,8 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(arrivalCount[1]);//send the product as a json response.
             }
         });
-        app.get('/stay/today-arrivals', async(req, res) => {
+        app.get('/stay/today-arrivals', async (req, res) =>
+        {
             const arrivingArrivals = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
@@ -82,7 +83,8 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(arrivingArrivals);//send the product as a json response.
             }
         })// find the arrival data where stayCheckinDate = today. make variable that holds today data?
-        app.get('/stay/today-departures', async(req, res) => {
+        app.get('/stay/today-departures', async (req, res) =>
+        {
             const departingDepartures = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckoutDate = :today", {today: dateObject})
@@ -99,8 +101,42 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(departingDepartures);//send the product as a json response.
             }
         })
-        app.get('/room/room-status', async(req, res) => {
+        app.get('/room/room-status', async (req, res) =>
+        {
             const roomStatus = await AppDataSource.getRepository(Room).find();
             res.json(roomStatus);
+        })
+        app.put('/room/room-status-change', async (req, res) =>
+        {
+            const roomList: Room[] = req.body;
+            const roomStatus = AppDataSource.getRepository(Room);
+            for (let room of roomList)
+            {
+                const existingRoom = await roomStatus.findOneBy({
+                    roomId: room.roomId
+                });
+                if (!existingRoom)
+                {
+                    res.status(404).json({
+                        message: ` Room Number ${room.roomId} not found`
+                    });
+                    return;
+                }
+                // @ts-ignore
+                roomStatus.merge(existingRoom, room);//merging the changes to the thing itself!
+                try
+                {
+                    await roomStatus.save(existingRoom);
+                }
+                catch (error)
+                {
+                    console.error('Error updating room: ', error);
+                    res.status(500).json({
+                        message: 'Failed to update room list'
+                    });
+                }
+                const savedRoomList = await roomStatus.find();
+                res.json(savedRoomList);
+            }
         })
     });

@@ -14,4 +14,9 @@ export class RoomService {
   {
     return this.http.get<Room[]>(`${this.url}/room/room-status`);
   }
+
+  saveRoomList(updatedRooms: Room[])
+  {
+    return this.http.put<Room[]>(`${this.url}/room/room-status-change`, updatedRooms);
+  }
 }

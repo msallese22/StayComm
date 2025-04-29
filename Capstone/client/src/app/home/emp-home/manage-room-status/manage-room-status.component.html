@@ -1,13 +1,14 @@
-<mat-button-toggle-group aria-label="Show All...">
-  <mat-button-toggle value="clean" (click)="applyFilter('clean')">Clean</mat-button-toggle>
-  <mat-button-toggle value="dirty" (click)="applyFilter('dirty')">Dirty</mat-button-toggle>
-  <mat-button-toggle-group value="all" (click)="applyFilter('all')">All</mat-button-toggle-group>
+<mat-button-toggle-group name="room-status" aria-label="Show All..." [formControl]="cleanFilter">
+  <mat-button-toggle class="status-toggle" value="clean" (click)="applyFilter('clean')">Clean</mat-button-toggle>
+  <mat-button-toggle class="status-toggle" value="dirty" (click)="applyFilter('dirty')">Dirty</mat-button-toggle>
 </mat-button-toggle-group>
-<mat-button-toggle-group aria-label="Show All...">
-  <mat-button-toggle value="queen" (click)="applyFilter('queen')">Queen</mat-button-toggle>
-  <mat-button-toggle value="king" (click)="applyFilter('king')">King</mat-button-toggle>
-  <mat-button-toggle-group value="all" (click)="applyFilter('all')">All</mat-button-toggle-group>
+
+<mat-button-toggle-group name="room-type" aria-label="Show All..." [formControl]="typeFilter">
+  <mat-button-toggle class="type-toggle" value="queen" (click)="applyFilter('queen')">Queen</mat-button-toggle>
+  <mat-button-toggle class="status-toggle" value="king" (click)="applyFilter('king')">King</mat-button-toggle>
 </mat-button-toggle-group>
+
+<button mat-button class="save-button" (click)="saveChanges()">Save Changes</button>
 
 <div class="mat-elevation-z8">
   <table mat-table [dataSource]="dataSource">
@@ -21,14 +22,28 @@
     <!-- current status -->
     <ng-container matColumnDef="roomIsClean">
       <th mat-header-cell *matHeaderCellDef> Current Room Status</th>
-      <td mat-cell *matCellDef="let row"> {{ row.roomIsClean }}</td>
+      <td mat-cell *matCellDef="let row" class="roomIsClean-text">
+        @if (row.roomIsClean === true)
+      {
+        Clean
+      } @else
+      {
+        Dirty
+      }
+       </td>
     </ng-container>
 
     <!-- change -->
     <ng-container matColumnDef="changeRoomIsClean">
-      <th mat-header-cell *matHeaderCellDef> Change Status</th>
+      <th mat-header-cell *matHeaderCellDef>Update Status</th>
       <td mat-cell *matCellDef="let row">
-        <ng-template></ng-template>
+        <mat-checkbox (change)="updateRoomStatus($event, row.roomId)">
+          @if(row.roomIsClean === true){
+            Dirty
+          }
+           @else{
+             Clean
+           }</mat-checkbox>
       </td>
     </ng-container>
 
