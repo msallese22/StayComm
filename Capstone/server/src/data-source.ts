@@ -8,7 +8,8 @@ import {Property} from "./entities/property";
 import {Employee} from "./entities/employee";
 import {Room} from "./entities/room";
 import {CreditCard} from "./entities/credit-card";
-import {Rate} from "./entities/rate";
+import {RatePrice} from "./entities/rate-price";
+import {StayRate} from "./entities/stay-rate";
 
 
 const AppDataSource = new DataSource({
@@ -20,7 +21,7 @@ const AppDataSource = new DataSource({
     database: 'StayComm',
     synchronize: false,
     logging: true,
-    entities: [Guest, Stay, Property, Room, CreditCard, Employee, Rate],
+    entities: [Guest, Stay, Property, Room, CreditCard, Employee, RatePrice, StayRate],
     subscribers: [],
     migrations: []
 });

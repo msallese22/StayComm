@@ -9,6 +9,7 @@ import {Guest} from "./entities/guest"
 import {Employee} from "./entities/employee"
 import {Property} from "./entities/property"
 import {Repository} from "typeorm";
+import {RatePrice} from "./entities/rate-price";
 
 const app: Express = express();
 const port: number = 3000;
@@ -122,7 +123,7 @@ AppDataSource.initialize()//initializing where the database is to go!
                     });
                     return;
                 }
-                // @ts-ignore
+                //
                 roomStatus.merge(existingRoom, room);//merging the changes to the thing itself!
                 try
                 {
@@ -135,8 +136,13 @@ AppDataSource.initialize()//initializing where the database is to go!
                         message: 'Failed to update room list'
                     });
                 }
-                const savedRoomList = await roomStatus.find();
-                res.json(savedRoomList);
             }
+            const savedRoomList = await roomStatus.find();
+            res.json(savedRoomList);
         })
+        //getting a list of ratePrices, returning the sum of them to the stay?
+       /*app.get('rate/rate-price', async (req, res) => {
+            const rateList: RatePrice[] = req.body;
+            const totalStayDates:
+        })*/
     });

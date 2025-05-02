@@ -13,10 +13,10 @@ import {MatSort} from '@angular/material/sort';
 import {Room} from '../../../models/room-status';
 import {RoomService} from '../../../services/room/room.service';
 import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
-import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
+import {MatButtonToggle, MatButtonToggleChange, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
 import {MatButton} from '@angular/material/button';
-import {FormControl, FormsModule, isFormControl, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-manage-room-status',
@@ -73,21 +73,95 @@ export class ManageRoomStatusComponent  implements OnInit
   {
     this.dataSource.filterPredicate = (data: Room, filter: string) =>
     {
-      if(filter === 'clean')
+      if(filter==='clean')
       {
-        return data.roomIsClean;
+        if(this.typeFilter.value === 'king')
+        {
+          return data.roomIsClean && data.roomType === 'K';
+        }
+        else if(this.typeFilter.value === 'queen')
+        {
+          return data.roomIsClean && data.roomType === 'Q';
+        }
+        else
+        {
+          return data.roomIsClean;
+        }
       }
-      else if(filter === 'dirty')
+      else if(filter==='dirty')
       {
-        return !data.roomIsClean;
+        if(this.typeFilter.value === 'king')
+        {
+          return !data.roomIsClean && data.roomType === 'K';
+        }
+        else if(this.typeFilter.value === 'queen')
+        {
+          return !data.roomIsClean && data.roomType === 'Q';
+        }
+        else
+        {
+          return !data.roomIsClean;
+        }
       }
-      else if(filter === 'king')
+      else if(filter==='king')
       {
-        return data.roomType === 'K';
+        if(this.cleanFilter.value === 'clean')
+        {
+          return data.roomIsClean && data.roomType === 'K';
+        }
+        else if(this.cleanFilter.value === 'dirty')
+        {
+          return !data.roomIsClean && data.roomType === 'K';
+        }
+        else
+        {
+          return data.roomType === 'K';
+        }
       }
-      else if(filter === 'queen')
+      else if(filter==='queen')
       {
-        return data.roomType === 'Q';
+        if(this.cleanFilter.value === 'clean')
+        {
+          return data.roomIsClean && data.roomType === 'Q';
+        }
+        else if(this.cleanFilter.value === 'dirty')
+        {
+          return !data.roomIsClean && data.roomType === 'Q';
+        }
+        else
+        {
+          return data.roomType === 'Q';
+        }
+      }
+      else if(filter === 'all-statuses')
+      {
+        if(this.typeFilter.value === 'king')
+        {
+          return data.roomType === 'K'
+        }
+        else if(this.typeFilter.value === 'queen')
+        {
+          return data.roomType === 'Q'
+        }
+        else
+        {
+          return true;
+        }
+      }
+      else if(filter === 'all-types')
+      {
+        if(this.cleanFilter.value === 'dirty')
+        {
+          return !data.roomIsClean;
+        }
+        else if(this.cleanFilter.value === 'clean')
+        {
+          return data.roomIsClean;
+        }
+        else
+        {
+          return true;
+        }
       }
       else
       {
@@ -99,36 +173,9 @@ export class ManageRoomStatusComponent  implements OnInit
       this.dataSource.data = rooms;
     });
   }
-
-
-  applyFilter(value: string)
+  applyFilter(event: MatButtonToggleChange)
   {
-    //these buttons are pressing my buttons! apply two filters at once?
-    console.log(this.cleanFilter.value);
-    console.log(`regular ${value}`);
-    this.dataSource.filter = value;
-    if(this.cleanFilter.value === 'clean')
-    {
-      this.cleanFilter.setValue(null);
-      console.log(`hit clean set value ${this.cleanFilter.value}`);
-    }
-    else if(this.cleanFilter.value === 'dirty')
-    {
-      this.cleanFilter.setValue(null);
-      console.log(`hit dirty set value ${this.cleanFilter.value}`);
-    }
-
-    if(this.typeFilter.value === 'queen')
-    {
-      this.typeFilter.setValue(null);
-      console.log(`hit queen set value ${this.typeFilter.value}`);
-    }
-    else if(this.typeFilter.value === 'king')
-    {
-      this.typeFilter.setValue(null);
-      console.log(`hit king set value ${this.typeFilter.value}`);
-
-    }
+    this.dataSource.filter = event.value;
   }
 
   saveChanges()
@@ -142,6 +189,6 @@ export class ManageRoomStatusComponent  implements OnInit
   updateRoomStatus(event: MatCheckboxChange,roomId:number )
   {
     const room = this.dataSource.data.find(room => room.roomId === roomId);
-    room!.roomIsClean = !event.checked;
+    room!.roomIsClean = event.checked;
   }
 }

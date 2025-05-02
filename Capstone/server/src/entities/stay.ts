@@ -2,9 +2,10 @@ import {type} from "node:os";
 
 export { Stay }
 
-import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn} from "typeorm";
+import {Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn} from "typeorm";
 import { Guest } from "./guest";
 import {Room} from "./room";
+import {RatePrice} from "./rate-price";
 
 @Entity("STAY")
 
@@ -30,4 +31,8 @@ class Stay
     @OneToMany(() => Room, room => room.stays)
     @JoinColumn({name: 'STAY_ID'})
     room!: Room;
+
+    @ManyToMany(() => RatePrice)
+    @JoinTable()
+    ratePriceId!: RatePrice[]
 }

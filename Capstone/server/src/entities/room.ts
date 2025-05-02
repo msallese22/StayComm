@@ -23,10 +23,7 @@ class Room
     @Column({ name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
 
-
     @ManyToOne(() => Stay, stay => stay.room)
     @JoinColumn({name: 'STAY_ID'})
     stays!: Stay;
-
-
 }
