@@ -1,3 +1,5 @@
+import {CreditCard} from './credit-card';
+
 export interface Guest{
   guestId: number;
   guestLname: string;
@@ -5,4 +7,5 @@ export interface Guest{
   guestEmail: string;
   guestPhone: number;
   guestPassword: string;
+  creditCard: CreditCard;
 }

@@ -1,6 +1,8 @@
+import {Guest} from "./guest";
+
 export { CreditCard }
 
-import {Column, Entity, PrimaryColumn } from "typeorm";
+import {Column, Entity, ManyToOne, PrimaryColumn} from "typeorm";
 
 @Entity("CREDIT_CARD")
 
@@ -18,6 +20,6 @@ class CreditCard
     @Column({name: 'CREDIT_CARD_CVV', type: 'int', unsigned: true})
     creditCardCvv!: number;
 
-    @Column({name: 'GUEST_ID', type: 'int', unsigned: true})
-    guestId!: number;
+    @ManyToOne(() => Guest, guest => guest.creditCards)
+    guest!: Guest;
 }

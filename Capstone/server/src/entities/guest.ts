@@ -2,7 +2,8 @@ import {Stay} from "./stay";
 
 export { Guest }
 
-import {Column, Entity, OneToMany, PrimaryColumn, Relation} from "typeorm";
+import {Column, Entity, ManyToOne, OneToMany, PrimaryColumn, Relation} from "typeorm";
+import {CreditCard} from "./credit-card";
 
 @Entity("GUEST")
 
@@ -28,5 +29,8 @@ class Guest
 
     @OneToMany(() => Stay, stay => stay.guest)
     stays!: Stay;
+
+    @OneToMany(() => CreditCard, creditCard => creditCard.guest)
+    creditCards!: CreditCard
 
 }

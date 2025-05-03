@@ -30,4 +30,9 @@ export class StayService {
     return this.http.get<StayInfo[]>(`${this.url}/stay/today-departures`);
   }
 
+  createNewStay(stay:StayInfo)
+  {
+    return this.http.post<StayInfo>(`${this.url}/stay/save-new-stay`, stay);
+  }
+
 }

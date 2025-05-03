@@ -140,6 +140,76 @@ AppDataSource.initialize()//initializing where the database is to go!
             const savedRoomList = await roomStatus.find();
             res.json(savedRoomList);
         })
+        app.post('/stay/save-new-stay', async(req, res) =>
+        {
+            const stayData = req.body;
+
+            const requiredFields = [
+                'stayCheckinDate',
+                'stayCheckoutDate',
+                'guestFirstName',
+                'guestLastName',
+                'guestPhone',
+                'guestEmail',
+                'roomType',
+                'creditCardNumber',
+                'creditCardExp',
+                'creditCardCvv'
+            ];
+
+            if(requiredFields.some(field => stayData[field] === undefined
+                || stayData[field] === null))
+            {
+                res.status(400).json({
+                    message: 'Values are required for all columns'
+                });
+                return;
+            }
+
+            const stayRepository:Repository<any> = AppDataSource.getRepository(Stay);
+            const roomRepository:Repository<any> = AppDataSource.getRepository(Room);
+
+            try
+            {
+                const newStay = stayRepository.create(stayData);
+                const savedStay:Stay = await stayRepository.save(newStay);
+                const roomMatch = await roomRepository.findOneBy({
+                    roomType:stayData.roomType,
+                    stayId:null
+                });
+                roomMatch.stayId = savedStay.stayId;
+                await roomRepository.save(roomMatch);
+                res.status(201).json(savedStay);
+            }
+            catch(error)
+            {
+                console.error('Error creating Stay', error);
+                res.status(500).json({
+                    message: 'Failed to create Stay.', error
+                });
+            }
+        });
+        app.get('/guest-info/:id', async (req, res) => {
+            const id = +req.params.id;
+           /* const guest = await AppDataSource.getRepository(Guest).createQueryBuilder("guest")
+                .innerJoinAndSelect("guest.creditCards", "creditCard")
+                .where("guest.guestId = :id", {id: id})
+                .getOne(); */
+            const guest = await AppDataSource.getRepository(Guest).findOneBy({
+                guestId: id
+            });
+            if(!guest)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `Guest with ID ${id} not found :(`
+                })
+            }
+            else
+            {
+                res.json(guest);//send the product as a json response.
+            }
+        })
         //getting a list of ratePrices, returning the sum of them to the stay?
        /*app.get('rate/rate-price', async (req, res) => {
             const rateList: RatePrice[] = req.body;

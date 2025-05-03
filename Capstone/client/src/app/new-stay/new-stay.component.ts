@@ -10,6 +10,11 @@ import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/
 import {provideNativeDateAdapter} from '@angular/material/core';
 import {NgxMaskDirective} from 'ngx-mask';
 import {MatTooltip} from '@angular/material/tooltip';
+import {StayService} from '../services/stay/stay.service';
+import {GuestService} from '../services/guest/guest.service';
+
+import {StayInfo} from '../models/stay-info';
+import {Guest} from '../models/guest-interface';
 
 @Component({
   selector: 'app-new-stay',
@@ -37,6 +42,8 @@ export class NewStayComponent implements OnInit
 {
   dialog = inject(MatDialog);
   router = inject(Router);
+  stayService = inject(StayService);
+  guestService = inject(GuestService);
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -45,7 +52,7 @@ export class NewStayComponent implements OnInit
   king?: boolean | null = null;
 
   roomType:string[] | null = ['King', 'Queen'];
-//ADD RESERVATION NOTES! ALSO GET PASSED TO MODAL!
+//ADD RESERVATION NOTES!
 
   newStayForm = new FormGroup({
     checkInDate: new FormControl('', [Validators.required]),
@@ -65,6 +72,8 @@ export class NewStayComponent implements OnInit
     })
   });
 
+  private guest!:Guest;
+
   get guestInfoFormGroup()
   {
     return this.newStayForm.get('guestInfoForm') as FormGroup;
@@ -83,13 +92,20 @@ export class NewStayComponent implements OnInit
   ngOnInit(): void
   {
       this.creditCardInfoFormGroup.get("creditCardNumber")?.valueChanges.subscribe(value => {
-
         if(value.length === 16)
         {
           const lastFour = value.substring(12);
           const abstractedNumbers = "XXXXXXXXXXXX" + lastFour;
           this.creditCardInfoFormGroup.get("creditCardNumber")?.setValue(abstractedNumbers, {emitEvent : false})
         }
+      });
+
+      this.guestService.getGuestById(100).subscribe( data => {
+        this.guest = data;
+        this.guestInfoFormGroup.get("guestFirstName")?.setValue(data.guestFname);
+        this.guestInfoFormGroup.get("guestLastName")?.setValue(data.guestLname);
+        this.guestInfoFormGroup.get("guestPhone")?.setValue(data.guestPhone);
+        this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
       })
   }
 
@@ -104,22 +120,48 @@ export class NewStayComponent implements OnInit
 
   openDialog()
   {
+    const formValue = this.newStayForm.value;
+    const guestFormGroupValue = this.guestInfoFormGroup.value;
+    const creditCardFormGroupValue = this.creditCardInfoFormGroup.value;
+    const newStay:StayInfo = {
+      stayId: 0,
+      stayCheckinDate: formValue.checkInDate ? new Date(formValue.checkInDate) : new Date(),
+      stayCheckoutDate: formValue.checkOutDate ? new Date(formValue.checkOutDate) : new Date(),
+      guest:
+        {
+          guestId: this.guest.guestId,
+          guestFname: guestFormGroupValue.guestFirstName ? guestFormGroupValue.guestFirstName:"",
+          guestLname: guestFormGroupValue.guestLastName ? guestFormGroupValue.guestLastName:"",
+          guestEmail: guestFormGroupValue.guestEmail ? guestFormGroupValue.guestEmail:"",
+          guestPhone: guestFormGroupValue.guestPhone ? guestFormGroupValue.guestPhone:"",
+          guestPassword: this.guest.guestPassword,
+          creditCard:
+            {
+              creditCardId: this.guest.creditCard.creditCardId,
+              creditCardNum: creditCardFormGroupValue.creditCardNum ? creditCardFormGroupValue.creditCardNum:"",
+              creditCardExp: creditCardFormGroupValue.creditCardExp ? creditCardFormGroupValue.creditCardExp: new Date(),
+              creditCardCvv: creditCardFormGroupValue.creditCardCvv ? creditCardFormGroupValue.creditCardCVV:""
+            }
+        },
 
-    const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
-      data: {
-        isCreate: true,
-        stayId: 123456,
-        checkInDate: this.newStayForm.get('checkInDate')?.value,
-        checkOutDate: this.newStayForm.get('checkOutDate')?.value,
-        roomType: this.newStayForm.get('roomType')?.value
-      }, height: '400px',
-      width: '500px',
-      panelClass: "style-modal"
-    });
-    dialogRef.afterClosed().subscribe(() =>
-    {
-      this.router.navigateByUrl("/home");
-    });
+    }
+    this.stayService.createNewStay(newStay).subscribe(data => {
+      const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
+        data: {
+          isCreate: true,
+          stayId: data.stayId,
+          checkInDate: data.stayCheckinDate,
+          checkOutDate: data.stayCheckoutDate,
+          roomType: this.newStayForm.get('roomType')?.value
+        }, height: '400px',
+        width: '500px',
+        panelClass: "style-modal"
+      });
+      dialogRef.afterClosed().subscribe(() =>
+      {
+        this.router.navigateByUrl("/home");
+      });
+    })
   }
 }
 
