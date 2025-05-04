@@ -140,25 +140,35 @@ AppDataSource.initialize()//initializing where the database is to go!
             const savedRoomList = await roomStatus.find();
             res.json(savedRoomList);
         })
-        app.post('/stay/save-new-stay', async(req, res) =>
+        app.post('/stay/save-new-stay/:roomType', async(req, res) =>
         {
+            const roomType = req.params.roomType;
             const stayData = req.body;
 
-            const requiredFields = [
+            const stayRequiredFields = [
                 'stayCheckinDate',
                 'stayCheckoutDate',
-                'guestFirstName',
-                'guestLastName',
+            ];
+
+            const guestRequiredFields = [
+                'guestFname',
+                'guestLname',
                 'guestPhone',
                 'guestEmail',
-                'roomType',
-                'creditCardNumber',
+            ];
+
+            const creditCardRequiredFields = [
+                'creditCardNum',
                 'creditCardExp',
                 'creditCardCvv'
             ];
 
-            if(requiredFields.some(field => stayData[field] === undefined
-                || stayData[field] === null))
+            if(stayRequiredFields.some(field => stayData[field] === undefined
+                || stayData[field] === null) ||
+                guestRequiredFields.some(field => stayData.guest[field] === undefined
+                    || stayData.guest[field] === null)
+                || creditCardRequiredFields.some(field => stayData.guest.creditCard[field] === undefined
+                        || stayData.guest.creditCard[field] === null))
             {
                 res.status(400).json({
                     message: 'Values are required for all columns'
@@ -169,12 +179,30 @@ AppDataSource.initialize()//initializing where the database is to go!
             const stayRepository:Repository<any> = AppDataSource.getRepository(Stay);
             const roomRepository:Repository<any> = AppDataSource.getRepository(Room);
 
+            if(stayData.guest.guestId === 0)
+            {
+                stayData.guest.guestId = undefined;
+                //make a new guest, bestie!
+            }
+
+            if(stayData.guest.creditCard.creditCardId === 0)
+            {
+                stayData.guest.creditCard.creditCardId = undefined;
+                //smallest Russian doll
+            }
+
+            if(stayData.stayId === 0)
+            {
+                const maxId = await stayRepository.maximum("stayId");
+                stayData.stayId = maxId? maxId +1 : 100;
+            }
+
             try
             {
                 const newStay = stayRepository.create(stayData);
                 const savedStay:Stay = await stayRepository.save(newStay);
                 const roomMatch = await roomRepository.findOneBy({
-                    roomType:stayData.roomType,
+                    roomType:roomType,
                     stayId:null
                 });
                 roomMatch.stayId = savedStay.stayId;

@@ -66,9 +66,9 @@ export class NewStayComponent implements OnInit
     }),
     roomType: new FormControl('', [Validators.required]),
     creditCardInfoForm: new FormGroup({
-      creditCardNumber: new FormControl('', [Validators.minLength(16), Validators.maxLength(16), Validators.required]),
+      creditCardNum: new FormControl('', [Validators.minLength(16), Validators.maxLength(16), Validators.required]),
       creditCardExp: new FormControl('', [Validators.required, Validators.maxLength(6), Validators.minLength(6)]),
-      creditCardCVV: new FormControl('',[Validators.required, Validators.minLength(3), Validators.maxLength(4)])
+      creditCardCvv: new FormControl('',[Validators.required, Validators.minLength(3), Validators.maxLength(4)])
     })
   });
 
@@ -115,7 +115,7 @@ export class NewStayComponent implements OnInit
   {
     this.newStayForm.get("roomType")?.setValue(roomType);
 
-    this.king = roomType === 'King';
+    this.king = roomType === 'K';
   }
 
   openDialog()
@@ -123,29 +123,34 @@ export class NewStayComponent implements OnInit
     const formValue = this.newStayForm.value;
     const guestFormGroupValue = this.guestInfoFormGroup.value;
     const creditCardFormGroupValue = this.creditCardInfoFormGroup.value;
+    console.log(creditCardFormGroupValue.creditCardNum);
+    console.log(creditCardFormGroupValue.creditCardCvv);
+    console.log(creditCardFormGroupValue.creditCardExp);
+    console.log(creditCardFormGroupValue.creditCardId);
     const newStay:StayInfo = {
       stayId: 0,
       stayCheckinDate: formValue.checkInDate ? new Date(formValue.checkInDate) : new Date(),
       stayCheckoutDate: formValue.checkOutDate ? new Date(formValue.checkOutDate) : new Date(),
       guest:
         {
-          guestId: this.guest.guestId,
+          guestId: this.guest ? this.guest.guestId: 0,
           guestFname: guestFormGroupValue.guestFirstName ? guestFormGroupValue.guestFirstName:"",
           guestLname: guestFormGroupValue.guestLastName ? guestFormGroupValue.guestLastName:"",
           guestEmail: guestFormGroupValue.guestEmail ? guestFormGroupValue.guestEmail:"",
           guestPhone: guestFormGroupValue.guestPhone ? guestFormGroupValue.guestPhone:"",
-          guestPassword: this.guest.guestPassword,
+          guestPassword: this.guest? this.guest.guestPassword:"",
           creditCard:
             {
-              creditCardId: this.guest.creditCard.creditCardId,
+              creditCardId: this.guest.creditCard ? this.guest.creditCard.creditCardId: 0,
               creditCardNum: creditCardFormGroupValue.creditCardNum ? creditCardFormGroupValue.creditCardNum:"",
               creditCardExp: creditCardFormGroupValue.creditCardExp ? creditCardFormGroupValue.creditCardExp: new Date(),
-              creditCardCvv: creditCardFormGroupValue.creditCardCvv ? creditCardFormGroupValue.creditCardCVV:""
+              creditCardCvv: creditCardFormGroupValue.creditCardCvv ? creditCardFormGroupValue.creditCardCvv:""
             }
         },
 
     }
-    this.stayService.createNewStay(newStay).subscribe(data => {
+    const roomTypeIsntNull = formValue.roomType ? formValue.roomType:"K";
+    this.stayService.createNewStay(newStay, roomTypeIsntNull).subscribe(data => {
       const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
         data: {
           isCreate: true,

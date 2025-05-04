@@ -65,9 +65,9 @@
       <div class="bottom-row">
         <div class="room-type">
           <p>Select A Room Type</p>
-          <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('King')">King Suite
+          <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('K')">King Suite
           </button>
-          <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('Queen')">Queen Suite
+          <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('Q')">Queen Suite
           </button>
           @if (king===true) {
             <p>You've selected a King Suite</p>
@@ -88,13 +88,13 @@
           <div class="style-credit-card">
             <mat-form-field appearance="outline">
               <mat-label>Credit Card Number:</mat-label>
-              <input formControlName="creditCardNumber" matInput placeholder="XXXX-XXXX-XXXX-XXXX"
+              <input formControlName="creditCardNum" matInput placeholder="XXXX-XXXX-XXXX-XXXX"
                      required [mask]="'AAAA-AAAA-AAAA-AAAA'">
-             @if(creditCardInfoFormGroup.get("creditCardNumber")?.hasError("required"))
+             @if(creditCardInfoFormGroup.get("creditCardNum")?.hasError("required"))
              {<mat-error>A Credit Card Number is required</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardNumber")?.hasError("minlength"))
+              @if(creditCardInfoFormGroup.get("creditCardNum")?.hasError("minlength"))
               {<mat-error>Credit Card Number Length is invalid. Not long enough.</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardNumber")?.hasError("maxlength"))
+              @if(creditCardInfoFormGroup.get("creditCardNum")?.hasError("maxlength"))
               {<mat-error>Credit Card Number Length is invalid. Too long.</mat-error>}
             </mat-form-field>
             <mat-form-field appearance="outline">
@@ -104,13 +104,13 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>CVV:</mat-label>
-              <input formControlName="creditCardCVV" matInput placeholder="XXX or XXXX" required minlength="3"
+              <input formControlName="creditCardCvv" matInput placeholder="XXX or XXXX" required minlength="3"
                      maxlength="4">
-              @if(creditCardInfoFormGroup.get("creditCardCVV")?.hasError("required"))
+              @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("required"))
               {<mat-error>A Credit Card CVV is required</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardCVV")?.hasError("minlength"))
+              @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("minlength"))
               {<mat-error>Credit Card CVV Length is invalid. Not long enough.</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardCVV")?.hasError("maxlength"))
+              @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("maxlength"))
               {<mat-error>Credit Card CVV Length is invalid. Too long.</mat-error>}
             </mat-form-field>
           </div>
