@@ -28,7 +28,8 @@ class Stay
     guest!: Guest;
     //creates a new type, fixes the circular dependency wowowowow
 
-    @OneToMany(() => Room, room => room.stays)
+    //when you save a stay, update the room, too.
+    @OneToMany(() => Room, room => room.stays, {cascade:true})
     @JoinColumn({name: 'STAY_ID'})
     room!: Room;
 

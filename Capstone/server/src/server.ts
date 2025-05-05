@@ -70,6 +70,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const arrivingArrivals = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
+                .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
                 .getMany();
             if (!arrivingArrivals)
@@ -88,6 +89,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const departingDepartures = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
+                .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayCheckoutDate = :today", {today: dateObject})
                 .getMany();
             if (!departingDepartures)
@@ -144,6 +146,11 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const roomType = req.params.roomType;
             const stayData = req.body;
+            stayData.stayCheckinDate = new Date(stayData.stayCheckinDate);
+            stayData.stayCheckoutDate = new Date(stayData.stayCheckoutDate);
+            stayData.propertyId = 1;
+
+
 
             const stayRequiredFields = [
                 'stayCheckinDate',
@@ -201,12 +208,20 @@ AppDataSource.initialize()//initializing where the database is to go!
             {
                 const newStay = stayRepository.create(stayData);
                 const savedStay:Stay = await stayRepository.save(newStay);
+
+                console.log(newStay);
                 const roomMatch = await roomRepository.findOneBy({
                     roomType:roomType,
-                    stayId:null
+                    roomIsBlocked: false
                 });
-                roomMatch.stayId = savedStay.stayId;
-                await roomRepository.save(roomMatch);
+
+                await roomRepository.update(roomMatch.roomId, {
+                    stays: newStay,
+                    roomIsBlocked: true
+                });
+
+                console.log(roomMatch);
+
                 res.status(201).json(savedStay);
             }
             catch(error)

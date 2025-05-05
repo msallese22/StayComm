@@ -27,7 +27,7 @@
     <!-- room number -->
     <ng-container matColumnDef="roomId">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Room Number </th>
-      <td mat-cell *matCellDef="let row"> {{row.roomId}} </td>
+      <td mat-cell *matCellDef="let row"> {{row.room[0].roomId}} </td>
     </ng-container>
 
     <!-- stay id -->
