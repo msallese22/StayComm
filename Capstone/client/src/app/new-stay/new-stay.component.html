@@ -9,7 +9,7 @@
             <mat-form-field>
               <mat-label>Check In Date</mat-label>
               <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="checkInPicker"
-                     formControlName="checkInDate" required/>
+                     formControlName="checkInDate" (dateChange)="pickMyDates($event)" required/>
               <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
               <mat-datepicker #checkInPicker></mat-datepicker>
               <mat-error>Check in date is required</mat-error>
@@ -23,7 +23,7 @@
           <mat-form-field>
             <mat-label>Check Out Date</mat-label>
             <input matInput [min]="checkOutMinDate" [max]="maxDate" [matDatepicker]="checkOutPicker"
-                   formControlName="checkOutDate" required/>
+                   formControlName="checkOutDate" required (dateChange)="pickMyDates($event)"/>
             <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
             <mat-datepicker #checkOutPicker></mat-datepicker>
             <mat-error>Check out date is required</mat-error>
@@ -81,8 +81,8 @@
         </div>
         <div class="rate">
           <p>Confirm Rate</p>
-          <div class="rate-ception"><p>$$$</p></div>
-          <mat-icon class="material-symbols-outlined info" matTooltip="A credit card is needed to guarantee your reservation. Nothing will be charged until checkout.">info</mat-icon>
+          <div class="rate-ception"><p>{{totalCost | currency}}</p></div>
+          <mat-icon class="material-symbols-outlined info" [matTooltip]="toolTipMessage"></mat-icon>
         </div>
         <div class="credit-card" [formGroup]="creditCardInfoFormGroup">
           <div class="style-credit-card">
@@ -113,6 +113,7 @@
               @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("maxlength"))
               {<mat-error>Credit Card CVV Length is invalid. Too long.</mat-error>}
             </mat-form-field>
+            <mat-icon class="material-symbols-outlined info" matTooltip="A credit card is needed to guarantee your reservation. Nothing will be charged until checkout.">info</mat-icon>
           </div>
         </div>
       </div>

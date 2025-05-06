@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {StayInfo} from '../../models/stay-info';
+import {Rate} from '../../models/rate';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,15 @@ export class StayService {
   createNewStay(stay:StayInfo, roomType:string)
   {
     return this.http.post<StayInfo>(`${this.url}/stay/save-new-stay/${roomType}`, stay);
+  }
+
+  postRateList(checkinDate:Date, checkoutDate:Date)
+  {
+    const body = {
+      checkinDate: checkinDate,
+      checkoutDate: checkoutDate
+    }
+    return this.http.post<Rate[]>(`${this.url}/rate/rate-price`, body);
   }
 
 }

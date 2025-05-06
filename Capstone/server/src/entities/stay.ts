@@ -33,7 +33,4 @@ class Stay
     @JoinColumn({name: 'STAY_ID'})
     room!: Room;
 
-    @ManyToMany(() => RatePrice)
-    @JoinTable()
-    ratePriceId!: RatePrice[]
 }

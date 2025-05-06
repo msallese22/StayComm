@@ -6,6 +6,7 @@ import {DepartTableComponent} from './home/emp-home/depart-table/depart-table.co
 
 import {ArriveTableComponent} from './home/emp-home/arrive-table/arrive-table.component';
 import {ManageRoomStatusComponent} from './home/emp-home/manage-room-status/manage-room-status.component';
+import {ManageStayComponent} from './manage-stay/manage-stay.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,9 @@ export const routes: Routes = [
   },
   {
     path: "room-status", component: ManageRoomStatusComponent
+  },
+  {
+    path: "manage-stay", component: ManageStayComponent
   },
   {
     path:"", component: HomeComponent

@@ -1,4 +1,3 @@
-import {Guest} from "./guest";
 
 export { RatePrice }
 
@@ -18,4 +17,8 @@ class RatePrice
 
     @Column({name: 'RATE_DATE', type: 'date'})
     rateDate!: Date;
+
+   @ManyToMany(() => Stay)
+    @JoinTable()
+    stays!: Stay[]
 }

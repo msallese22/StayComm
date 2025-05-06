@@ -254,8 +254,26 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
         })
         //getting a list of ratePrices, returning the sum of them to the stay?
-       /*app.get('rate/rate-price', async (req, res) => {
-            const rateList: RatePrice[] = req.body;
-            const totalStayDates:
-        })*/
+       app.post('/rate/rate-price', async (req, res) => {
+
+           const checkinDate = new Date(req.body.checkinDate)
+           const checkoutDate = new Date(req.body.checkoutDate)
+
+
+           const totalRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
+                   .where("ratePrice.rateDate >= :checkinDate", {checkinDate:checkinDate})
+                   .where("ratePrice.rateDate <= :checkoutDate", {checkoutDate:checkoutDate})
+                   .getMany();
+           if (!totalRate)
+           {
+               const defaultRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
+                   .where("ratePrice.rateDate = :checkinDate", {checkinDate: new Date("1901-11-11")})
+                   .getMany();
+               res.json(defaultRate)
+           }
+           else
+           {
+               res.json(totalRate);//send the product as a json response.
+           }
+        })
     });

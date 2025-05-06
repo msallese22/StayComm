@@ -5,7 +5,12 @@ import {MatDialog} from '@angular/material/dialog';
 import {SaveStayDetailsModalComponent} from '../shared/save-stay-details-modal/save-stay-details-modal.component';
 import {Router} from '@angular/router';
 import {MatError, MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
-import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerInputEvent,
+  MatDatepickerToggle
+} from '@angular/material/datepicker';
 import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import {NgxMaskDirective} from 'ngx-mask';
@@ -15,6 +20,8 @@ import {GuestService} from '../services/guest/guest.service';
 
 import {StayInfo} from '../models/stay-info';
 import {Guest} from '../models/guest-interface';
+import {Rate} from '../models/rate';
+import {CurrencyPipe} from '@angular/common';
 
 @Component({
   selector: 'app-new-stay',
@@ -31,7 +38,8 @@ import {Guest} from '../models/guest-interface';
     MatError,
     ReactiveFormsModule,
     NgxMaskDirective,
-    MatTooltip
+    MatTooltip,
+    CurrencyPipe
   ],
   templateUrl: './new-stay.component.html',
   providers: [provideNativeDateAdapter()],
@@ -44,12 +52,16 @@ export class NewStayComponent implements OnInit
   router = inject(Router);
   stayService = inject(StayService);
   guestService = inject(GuestService);
+  ratesArray:Rate[] = [];
+  totalCost:number = 0;
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
   readonly checkOutMinDate = new Date(this.minDate.getFullYear(), this.minDate.getMonth(), this.minDate.getDay() + 1);
-
+//better date validation because dates are annoiyigngjka
   king?: boolean | null = null;
+
+  toolTipMessage: string = "Your broken down total rate is: \n";
 
   roomType:string[] | null = ['King', 'Queen'];
 //ADD RESERVATION NOTES!
@@ -107,8 +119,32 @@ export class NewStayComponent implements OnInit
         this.guestInfoFormGroup.get("guestPhone")?.setValue(data.guestPhone);
         this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
       })
+
   }
 
+  pickMyDates(event: MatDatepickerInputEvent<Date>)
+  {
+    this.totalCost = 0;
+    this.ratesArray = [];
+    if(this.newStayForm.get("checkInDate"))
+    {
+      const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date;
+
+      if (this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
+      {
+        this.stayService.postRateList(checkInDateExists!, event.value!).subscribe(rates =>
+        {
+          this.ratesArray = rates;
+          this.ratesArray.forEach(rate =>
+          {
+            this.totalCost += +rate.ratePricePrice
+            this.toolTipMessage += `${rate.rateDate}: ${rate.ratePricePrice}`
+          })
+        })
+      }
+    }
+
+  }
 
 //returns if King RoomType or Queen RoomType has been selected. RoomType is set to null before a selection is made
   setRoomType(roomType: string)
@@ -118,15 +154,13 @@ export class NewStayComponent implements OnInit
     this.king = roomType === 'K';
   }
 
+
   openDialog()
   {
     const formValue = this.newStayForm.value;
     const guestFormGroupValue = this.guestInfoFormGroup.value;
     const creditCardFormGroupValue = this.creditCardInfoFormGroup.value;
-    console.log(creditCardFormGroupValue.creditCardNum);
-    console.log(creditCardFormGroupValue.creditCardCvv);
-    console.log(creditCardFormGroupValue.creditCardExp);
-    console.log(creditCardFormGroupValue.creditCardId);
+
     const newStay:StayInfo = {
       stayId: 0,
       stayCheckinDate: formValue.checkInDate ? new Date(formValue.checkInDate) : new Date(),
