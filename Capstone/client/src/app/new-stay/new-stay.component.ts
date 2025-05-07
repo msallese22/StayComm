@@ -3,7 +3,7 @@ import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
 import {SaveStayDetailsModalComponent} from '../shared/save-stay-details-modal/save-stay-details-modal.component';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatError, MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
 import {
   MatDatepicker,
@@ -22,6 +22,7 @@ import {StayInfo} from '../models/stay-info';
 import {Guest} from '../models/guest-interface';
 import {Rate} from '../models/rate';
 import {CurrencyPipe} from '@angular/common';
+import {error} from '@angular/compiler-cli/src/transformers/util';
 
 @Component({
   selector: 'app-new-stay',
@@ -49,11 +50,18 @@ import {CurrencyPipe} from '@angular/common';
 export class NewStayComponent implements OnInit
 {
   dialog = inject(MatDialog);
-  router = inject(Router);
-  stayService = inject(StayService);
+  //router = inject(Router);
+  //stayService = inject(StayService);
   guestService = inject(GuestService);
+  isNewStay:boolean = false;
+  stay: StayInfo | null = null;
+  modifiedStay: StayInfo = {} as StayInfo;
   ratesArray:Rate[] = [];
   totalCost:number = 0;
+
+  constructor(public route: ActivatedRoute, public stayService: StayService, public router: Router){}
+  //I might be messing everything up. let's find out?
+  // i know it's public by default, but it yelled at me if it wasn't SOMETHING so i made it something, jeez
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -62,6 +70,7 @@ export class NewStayComponent implements OnInit
   king?: boolean | null = null;
 
   toolTipMessage: string = "Your broken down total rate is: \n";
+  //and for some reason it's not putting the stuff on new lines every time. does it need to be a for loop???
 
   roomType:string[] | null = ['King', 'Queen'];
 //ADD RESERVATION NOTES!
@@ -112,13 +121,29 @@ export class NewStayComponent implements OnInit
         }
       });
 
+
+//preloading it with data from the database--- all baby get requests
+    //can we make it so if the email address or phone number matches an entry in the database, it populates the other stuff??
       this.guestService.getGuestById(100).subscribe( data => {
         this.guest = data;
         this.guestInfoFormGroup.get("guestFirstName")?.setValue(data.guestFname);
         this.guestInfoFormGroup.get("guestLastName")?.setValue(data.guestLname);
         this.guestInfoFormGroup.get("guestPhone")?.setValue(data.guestPhone);
         this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
-      })
+      });
+
+    const stayId = this.route.snapshot.paramMap.get('stayId');
+
+    if(stayId)
+      {
+        this.isNewStay = false
+        this.stayService.getStayById(stayId).subscribe({
+          next:(data) => {
+            this.stay = data;
+            this.modifiedStay = {... data};
+          }
+        })
+      }
 
   }
 
@@ -153,6 +178,7 @@ export class NewStayComponent implements OnInit
 
     this.king = roomType === 'K';
   }
+
 
 
   openDialog()

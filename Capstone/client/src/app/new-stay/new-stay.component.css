@@ -62,11 +62,27 @@
   margin-top: 10px;
 }
 
+.mat-icon{
+  width: 45px !important;
+  height: 45px !important;
+  font-size: 45px;
+  margin-right: 35px;
+  margin-top: 10px;
+}
+
 .info{
   font-size: 25px !important;
   position: absolute;
   bottom: -20px;
   right: -45px;
+}
+
+.credit-card-icon{
+  font-size: 25px !important;
+  display: flex;
+  position: relative;
+  margin-top: -25px;
+  margin-right: 10px !important;
 }
 
 .room-type{

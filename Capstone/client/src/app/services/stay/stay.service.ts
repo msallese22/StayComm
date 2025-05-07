@@ -45,4 +45,9 @@ export class StayService {
     return this.http.post<Rate[]>(`${this.url}/rate/rate-price`, body);
   }
 
+
+  getStayById(stayId: number): Observable<StayInfo>{
+    return this.http.put<StayInfo>(`${this.url}/stay/stay-id`, body);
+  }
+
 }

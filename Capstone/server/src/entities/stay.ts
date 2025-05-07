@@ -5,7 +5,6 @@ export { Stay }
 import {Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn} from "typeorm";
 import { Guest } from "./guest";
 import {Room} from "./room";
-import {RatePrice} from "./rate-price";
 
 @Entity("STAY")
 
@@ -19,6 +18,9 @@ class Stay
 
     @Column({name: 'STAY_CHECKOUT_DATE', type: 'date'})
     stayCheckoutDate!: Date;
+
+    @Column({name: 'STAY_IS_CHECKED_IN', type: 'boolean'})
+    stayIsCheckedIn!: boolean;
 
     @Column({name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;

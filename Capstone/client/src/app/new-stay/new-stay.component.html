@@ -1,124 +1,144 @@
 <div>
+
   <div class="new">
     Book a New Stay
   </div>
-    <form [formGroup]="newStayForm">
-      <div class="top-row">
-        <div class="check-in tiny-rectangles">
-          <div class="calendar-date">
-            <mat-form-field>
-              <mat-label>Check In Date</mat-label>
-              <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="checkInPicker"
-                     formControlName="checkInDate" (dateChange)="pickMyDates($event)" required/>
-              <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
-              <mat-datepicker #checkInPicker></mat-datepicker>
-              <mat-error>Check in date is required</mat-error>
-            </mat-form-field>
-
-          </div>
-        </div>
-        <div class="check-out tiny-rectangles">
-          <div class="calendar-date">
-          </div>
+  <form [formGroup]="newStayForm">
+    <div class="top-row">
+      <div class="check-in tiny-rectangles">
+        <div class="calendar-date">
           <mat-form-field>
-            <mat-label>Check Out Date</mat-label>
-            <input matInput [min]="checkOutMinDate" [max]="maxDate" [matDatepicker]="checkOutPicker"
-                   formControlName="checkOutDate" required (dateChange)="pickMyDates($event)"/>
-            <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
-            <mat-datepicker #checkOutPicker></mat-datepicker>
-            <mat-error>Check out date is required</mat-error>
+            <mat-label>Check In Date</mat-label>
+            <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="checkInPicker"
+                   formControlName="checkInDate" (dateChange)="pickMyDates($event)" required/>
+            <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+            <mat-datepicker #checkInPicker></mat-datepicker>
+            <mat-error>Check in date is required</mat-error>
           </mat-form-field>
 
         </div>
-        <div class="guest-info" [formGroup]="guestInfoFormGroup">
-          <div class="style-guest-name">
-            <mat-form-field appearance="outline">
-              <mat-label>Guest First Name</mat-label>
-              <input formControlName="guestFirstName" matInput required>
-              <mat-error>A First Name is required</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Guest Last Name</mat-label>
-              <input formControlName="guestLastName" matInput required>
-              <mat-error>A Last Name is required</mat-error>
-            </mat-form-field>
-          </div>
-          <div class="style-guest-info">
-            <mat-form-field appearance="outline">
-              <mat-label>Guest Phone Number</mat-label>
-              <input formControlName="guestPhone" matInput [mask]="'(000)000-0000'">
-              @if(guestInfoFormGroup.get("guestPhone")?.hasError("required"))
-              {<mat-error>A Phone Number is required</mat-error>}
-              @if(guestInfoFormGroup.get("guestPhone")?.hasError("minlength"))
-              {<mat-error>Phone number is invalid. Not long enough.</mat-error>}
-              @if(guestInfoFormGroup.get("guestPhone")?.hasError("maxlength"))
-              {<mat-error>Phone number is invalid. Too long.</mat-error>}
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Guest Email Address</mat-label>
-              <input formControlName="guestEmail" matInput required email>
-              <mat-error>An Email Address is required</mat-error>
-            </mat-form-field>
-          </div>
+      </div>
+      <div class="check-out tiny-rectangles">
+        <div class="calendar-date">
+        </div>
+        <mat-form-field>
+          <mat-label>Check Out Date</mat-label>
+          <input matInput [min]="checkOutMinDate" [max]="maxDate" [matDatepicker]="checkOutPicker"
+                 formControlName="checkOutDate" required (dateChange)="pickMyDates($event)"/>
+          <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+          <mat-datepicker #checkOutPicker></mat-datepicker>
+          <mat-error>Check out date is required</mat-error>
+        </mat-form-field>
+
+      </div>
+      <div class="guest-info" [formGroup]="guestInfoFormGroup">
+        <div class="style-guest-name">
+          <mat-form-field appearance="outline">
+            <mat-label>Guest First Name</mat-label>
+            <input formControlName="guestFirstName" matInput required>
+            <mat-error>A First Name is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Guest Last Name</mat-label>
+            <input formControlName="guestLastName" matInput required>
+            <mat-error>A Last Name is required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="style-guest-info">
+          <mat-form-field appearance="outline">
+            <mat-label>Guest Phone Number</mat-label>
+            <input formControlName="guestPhone" matInput [mask]="'(000)000-0000'">
+            @if (guestInfoFormGroup.get("guestPhone")?.hasError("required")) {
+              <mat-error>A Phone Number is required</mat-error>
+            }
+            @if (guestInfoFormGroup.get("guestPhone")?.hasError("minlength")) {
+              <mat-error>Phone number is invalid. Not long enough.</mat-error>
+            }
+            @if (guestInfoFormGroup.get("guestPhone")?.hasError("maxlength")) {
+              <mat-error>Phone number is invalid. Too long.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Guest Email Address</mat-label>
+            <input formControlName="guestEmail" matInput required email>
+            <mat-error>An Email Address is required</mat-error>
+          </mat-form-field>
         </div>
       </div>
-      <div class="bottom-row">
-        <div class="room-type">
-          <p>Select A Room Type</p>
-          <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('K')">King Suite
-          </button>
-          <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('Q')">Queen Suite
-          </button>
-          @if (king===true) {
-            <p>You've selected a King Suite</p>
-          }
-          @if (king===false) {
-            <p>You've selected a Queen Suite</p>
-          } @else {
-            <p></p>
-          }
-          <mat-icon class="info" matTooltip="Our King Suite will have a single King size bed and a sofa bed. Our Queen Suite has two Queen size beds and a sofa bed.">info</mat-icon>
-        </div>
-        <div class="rate">
-          <p>Confirm Rate</p>
-          <div class="rate-ception"><p>{{totalCost | currency}}</p></div>
-          <mat-icon class="material-symbols-outlined info" [matTooltip]="toolTipMessage"></mat-icon>
-        </div>
-        <div class="credit-card" [formGroup]="creditCardInfoFormGroup">
-          <div class="style-credit-card">
-            <mat-form-field appearance="outline">
-              <mat-label>Credit Card Number:</mat-label>
-              <input formControlName="creditCardNum" matInput placeholder="XXXX-XXXX-XXXX-XXXX"
-                     required [mask]="'AAAA-AAAA-AAAA-AAAA'">
-             @if(creditCardInfoFormGroup.get("creditCardNum")?.hasError("required"))
-             {<mat-error>A Credit Card Number is required</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardNum")?.hasError("minlength"))
-              {<mat-error>Credit Card Number Length is invalid. Not long enough.</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardNum")?.hasError("maxlength"))
-              {<mat-error>Credit Card Number Length is invalid. Too long.</mat-error>}
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Exp:</mat-label>
-              <input formControlName="creditCardExp" matInput placeholder="MM/YYYY" [mask]="'00/0000'" required>
-              <mat-error>A Credit Card Expiration Date is required</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>CVV:</mat-label>
-              <input formControlName="creditCardCvv" matInput placeholder="XXX or XXXX" required minlength="3"
-                     maxlength="4">
-              @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("required"))
-              {<mat-error>A Credit Card CVV is required</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("minlength"))
-              {<mat-error>Credit Card CVV Length is invalid. Not long enough.</mat-error>}
-              @if(creditCardInfoFormGroup.get("creditCardCvv")?.hasError("maxlength"))
-              {<mat-error>Credit Card CVV Length is invalid. Too long.</mat-error>}
-            </mat-form-field>
-            <mat-icon class="material-symbols-outlined info" matTooltip="A credit card is needed to guarantee your reservation. Nothing will be charged until checkout.">info</mat-icon>
-          </div>
+    </div>
+    <div class="bottom-row">
+      <div class="room-type">
+        <p>Select A Room Type</p>
+        <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('K')">King Suite
+        </button>
+        <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('Q')">Queen Suite
+        </button>
+        @if (king === true) {
+          <p>You've selected a King Suite</p>
+        }
+        @if (king === false) {
+          <p>You've selected a Queen Suite</p>
+        } @else {
+          <p></p>
+        }
+        <mat-icon class="info"
+                  matTooltip="Our King Suite will have a single King size bed and a sofa bed. Our Queen Suite has two Queen size beds and a sofa bed.">
+          info
+        </mat-icon>
+      </div>
+      <div class="rate">
+        <p>Confirm Rate</p>
+        <div class="rate-ception">
+          @if(totalCost === 0){
+            <p>Waiting for dates to be selected...</p>
+          } @else{
+         <p> {{ totalCost | currency }} </p>}</div>
+        <mat-icon class="material-symbols-outlined info" [matTooltip]="toolTipMessage">info</mat-icon>
+      </div>
+      <div class="credit-card" [formGroup]="creditCardInfoFormGroup">
+        <div class="style-credit-card">
+          <mat-form-field appearance="outline">
+            <mat-label>Credit Card Number:</mat-label>
+            <input formControlName="creditCardNum" matInput placeholder="XXXX-XXXX-XXXX-XXXX"
+                   required [mask]="'AAAA-AAAA-AAAA-AAAA'">
+            @if (creditCardInfoFormGroup.get("creditCardNum")?.hasError("required")) {
+              <mat-error>A Credit Card Number is required</mat-error>
+            }
+            @if (creditCardInfoFormGroup.get("creditCardNum")?.hasError("minlength")) {
+              <mat-error>Credit Card Number Length is invalid. Not long enough.</mat-error>
+            }
+            @if (creditCardInfoFormGroup.get("creditCardNum")?.hasError("maxlength")) {
+              <mat-error>Credit Card Number Length is invalid. Too long.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Exp:</mat-label>
+            <input formControlName="creditCardExp" matInput placeholder="MM/YYYY" [mask]="'00/0000'" required>
+            <mat-error>A Credit Card Expiration Date is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>CVV:</mat-label>
+            <input formControlName="creditCardCvv" matInput placeholder="XXX or XXXX" required minlength="3"
+                   maxlength="4">
+            @if (creditCardInfoFormGroup.get("creditCardCvv")?.hasError("required")) {
+              <mat-error>A Credit Card CVV is required</mat-error>
+            }
+            @if (creditCardInfoFormGroup.get("creditCardCvv")?.hasError("minlength")) {
+              <mat-error>Credit Card CVV Length is invalid. Not long enough.</mat-error>
+            }
+            @if (creditCardInfoFormGroup.get("creditCardCvv")?.hasError("maxlength")) {
+              <mat-error>Credit Card CVV Length is invalid. Too long.</mat-error>
+            }
+          </mat-form-field>
+          <mat-icon class="material-symbols-outlined credit-card-icon"
+                    matTooltip="A credit card is needed to guarantee your reservation. Nothing will be charged until checkout.">
+            info
+          </mat-icon>
         </div>
       </div>
-      <div class="book-container">
-  <button mat-raised-button class="book" (click)="openDialog()" [disabled]="newStayFormInvalid">Book</button>
-</div>
-</form>
+    </div>
+    <div class="book-container">
+      <button mat-raised-button class="book" (click)="openDialog()" [disabled]="newStayFormInvalid">Book</button>
+    </div>
+  </form>
 </div>
