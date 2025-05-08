@@ -145,6 +145,12 @@
   width: 40%;
 }
 
+.cancel{
+  background: linear-gradient(to left
+  , #ff6c69, #ffa9f9);
+  color: #4b2141 !important;
+}
+
 .book:disabled{
   background: #c5bcbf !important;
 }

@@ -1,8 +1,19 @@
 <div>
+@if(stay || isNewStay)
+{
+  @if(isNewStay)
+  {
+    <div class="new">
+      Book a New Stay
+    </div>
+  } @else if(stay)
+  {
+    <div class="new">
+       Manage Stay
+    </div>
+  }
 
-  <div class="new">
-    Book a New Stay
-  </div>
+
   <form [formGroup]="newStayForm">
     <div class="top-row">
       <div class="check-in tiny-rectangles">
@@ -138,7 +149,12 @@
       </div>
     </div>
     <div class="book-container">
-      <button mat-raised-button class="book" (click)="openDialog()" [disabled]="newStayFormInvalid">Book</button>
+      <button mat-raised-button class="book" (click)="openDialog()" [disabled]="newStayFormInvalid">{{ isNewStay ? "Book" : "Save Changes" }}</button>
+      @if(!isNewStay)
+      {
+        <button mat-raised-button class="cancel"> Cancel Stay </button>
+      }
     </div>
   </form>
+}
 </div>

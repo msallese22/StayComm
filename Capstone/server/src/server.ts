@@ -275,7 +275,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
             else
             {
-                res.json(totalRate);//send the product as a json response.
+                res.json(totalRate);
             }
         });
 
@@ -308,7 +308,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             if(!existingStay)
             {
                 res.status(404).json({
-                    message: `Product with id ${id} not found`
+                    message: `Stay with id ${id} not found`
                 });
                 return;
             }

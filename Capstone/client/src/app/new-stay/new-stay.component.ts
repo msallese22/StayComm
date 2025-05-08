@@ -22,7 +22,6 @@ import {StayInfo} from '../models/stay-info';
 import {Guest} from '../models/guest-interface';
 import {Rate} from '../models/rate';
 import {CurrencyPipe} from '@angular/common';
-import {error} from '@angular/compiler-cli/src/transformers/util';
 
 @Component({
   selector: 'app-new-stay',
@@ -137,13 +136,18 @@ export class NewStayComponent implements OnInit
     if(stayId)
       {
         this.isNewStay = false
-        this.stayService.getStayById(stayId).subscribe({
+        this.stayService.getStayById(+stayId).subscribe({
           next:(data) => {
             this.stay = data;
             this.modifiedStay = {... data};
           }
         })
       }
+    else
+    {
+      this.isNewStay = true;
+      this.modifiedStay = {} as StayInfo;
+    }
 
   }
 
