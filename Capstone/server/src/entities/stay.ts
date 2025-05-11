@@ -22,6 +22,9 @@ class Stay
     @Column({name: 'STAY_IS_CHECKED_IN', type: 'boolean'})
     stayIsCheckedIn!: boolean;
 
+    @Column({name: 'ROOM_TYPE', type: 'char'})
+    roomType!: string;
+
     @Column({name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
 

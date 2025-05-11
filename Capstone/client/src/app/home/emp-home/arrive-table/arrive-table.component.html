@@ -20,9 +20,6 @@
     <ng-container matColumnDef="stayCheckinDate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Check-in Date </th>
       <td mat-cell *matCellDef="let row"> {{row.stayCheckinDate}}
-        <a href=`${this.url}/stay/${stayId}`>
-          <div style="height:100%;width:100%"></div>
-        </a>
       </td>
     </ng-container>
 
@@ -39,10 +36,8 @@
     <!-- room number -->
     <ng-container matColumnDef="roomId">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Room Number </th>
-      <td mat-cell *matCellDef="let row"> {{row.room[0].roomId}}
-        <a href="/stay/id">
-          <div style="height:100%;width:100%"></div>
-        </a>
+      <td mat-cell *matCellDef="let row">
+        <a routerLink="/stay/{{row.stayId}}">{{row.room[0].roomId}}</a>
       </td>
     </ng-container>
 

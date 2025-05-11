@@ -5,12 +5,13 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {StayInfo} from '../../../models/stay-info';
 import {StayService} from '../../../services/stay/stay.service';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-arrive-table',
   styleUrl: 'arrive-table.component.css',
   templateUrl: 'arrive-table.component.html',
-  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule],
+  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, RouterLink],
   standalone: true
 })
 export class ArriveTableComponent implements AfterViewInit, OnInit

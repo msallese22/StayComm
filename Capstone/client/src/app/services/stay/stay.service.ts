@@ -31,9 +31,9 @@ export class StayService {
     return this.http.get<StayInfo[]>(`${this.url}/stay/today-departures`);
   }
 
-  createNewStay(stay:StayInfo, roomType:string)
+  createNewStay(stay:StayInfo)
   {
-    return this.http.post<StayInfo>(`${this.url}/stay/save-new-stay/${roomType}`, stay);
+    return this.http.post<StayInfo>(`${this.url}/stay/save-new-stay/`, stay);
   }
 
   postRateList(checkinDate:Date, checkoutDate:Date)

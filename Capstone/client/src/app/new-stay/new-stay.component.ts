@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
@@ -74,7 +74,13 @@ export class NewStayComponent implements OnInit
   roomType:string[] | null = ['King', 'Queen'];
 //ADD RESERVATION NOTES!
 
+private _isEdit:boolean = false;
+  @Input()
+  set isEdit(edit:boolean) {
+    this._isEdit = edit;
+  }
   newStayForm = new FormGroup({
+
     checkInDate: new FormControl('', [Validators.required]),
     checkOutDate: new FormControl('',[Validators.required]),
     guestInfoForm: new FormGroup({
@@ -131,24 +137,39 @@ export class NewStayComponent implements OnInit
         this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
       });
 
-    const stayId = this.route.snapshot.paramMap.get('stayId');
-
-    if(stayId)
+      if(this._isEdit)
       {
-        this.isNewStay = false
-        this.stayService.getStayById(+stayId).subscribe({
-          next:(data) => {
-            this.stay = data;
-            this.modifiedStay = {... data};
-          }
-        })
-      }
-    else
-    {
-      this.isNewStay = true;
-      this.modifiedStay = {} as StayInfo;
-    }
+        const stayId = this.route.snapshot.paramMap.get('stayId');
 
+        if (stayId)
+        {
+          this.isNewStay = false
+          this.stayService.getStayById(+stayId).subscribe({
+            next: (data) =>
+            {
+              this.stay = data;
+              this.modifiedStay = {...data};
+
+              this.newStayForm.get("checkInDate")?.setValue(`${this.modifiedStay.stayCheckinDate}`)
+              this.newStayForm.get("checkOutDate")?.setValue(`${this.modifiedStay.stayCheckoutDate}`)
+              this.newStayForm.get("roomType")?.setValue(this.modifiedStay.roomType)
+              this.guestInfoFormGroup.get("guestFirstName")?.setValue(this.modifiedStay.guest.guestFname);
+              this.guestInfoFormGroup.get("guestLastName")?.setValue(this.modifiedStay.guest.guestLname);
+              this.guestInfoFormGroup.get("guestPhone")?.setValue(this.modifiedStay.guest.guestPhone);
+              this.guestInfoFormGroup.get("guestEmail")?.setValue(this.modifiedStay.guest.guestEmail);
+
+              this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(this.modifiedStay.guest.creditCard.creditCardNum);
+              this.creditCardInfoFormGroup.get("creditCardExp")?.setValue(this.modifiedStay.guest.creditCard.creditCardExp);
+              this.creditCardInfoFormGroup.get("creditCardCvv")?.setValue(this.modifiedStay.guest.creditCard.creditCardCvv);
+            }
+          })
+        }
+        else
+        {
+          this.isNewStay = true;
+          this.modifiedStay = {} as StayInfo;
+        }
+      }
   }
 
   pickMyDates(event: MatDatepickerInputEvent<Date>)
@@ -195,6 +216,7 @@ export class NewStayComponent implements OnInit
       stayId: 0,
       stayCheckinDate: formValue.checkInDate ? new Date(formValue.checkInDate) : new Date(),
       stayCheckoutDate: formValue.checkOutDate ? new Date(formValue.checkOutDate) : new Date(),
+      roomType: formValue.roomType ? formValue.roomType : "K",
       guest:
         {
           guestId: this.guest ? this.guest.guestId: 0,
@@ -213,8 +235,7 @@ export class NewStayComponent implements OnInit
         },
 
     }
-    const roomTypeIsntNull = formValue.roomType ? formValue.roomType:"K";
-    this.stayService.createNewStay(newStay, roomTypeIsntNull).subscribe(data => {
+    this.stayService.createNewStay(newStay).subscribe(data => {
       const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
         data: {
           isCreate: true,

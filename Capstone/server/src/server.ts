@@ -143,9 +143,8 @@ AppDataSource.initialize()//initializing where the database is to go!
             const savedRoomList = await roomStatus.find();
             res.json(savedRoomList);
         });
-        app.post('/stay/save-new-stay/:roomType', async (req, res) =>
+        app.post('/stay/save-new-stay/', async (req, res) =>
         {
-            const roomType = req.params.roomType;
             const stayData = req.body;
             stayData.stayCheckinDate = new Date(stayData.stayCheckinDate);
             stayData.stayCheckoutDate = new Date(stayData.stayCheckoutDate);
@@ -209,19 +208,6 @@ AppDataSource.initialize()//initializing where the database is to go!
                 const newStay = stayRepository.create(stayData);
                 const savedStay: Stay = await stayRepository.save(newStay);
 
-                console.log(newStay);
-                const roomMatch = await roomRepository.findOneBy({
-                    roomType: roomType,
-                    roomIsBlocked: false
-                });
-
-                await roomRepository.update(roomMatch.roomId, {
-                    stays: newStay,
-                    roomIsBlocked: true
-                });
-
-                console.log(roomMatch);
-
                 res.status(201).json(savedStay);
             }
             catch (error)
@@ -283,6 +269,13 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const id = req.params.id;
 
+            const stayById = AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+
+                .innerJoinAndSelect("stay.guest", "guest")
+                .innerJoinAndSelect("stay.guest.creditCard", "creditCard")
+                .where("stay.stayId = :id", {id: id})
+                .getOne();
+
             const stay = await AppDataSource.getRepository(Stay).findOneBy({
                 stayId: +id
             });
@@ -294,7 +287,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
             else
             {
-                res.json(stay);
+                res.json(stayById);
             }
         });
 
