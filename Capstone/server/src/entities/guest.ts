@@ -2,7 +2,7 @@ import {Stay} from "./stay";
 
 export { Guest }
 
-import {Column, Entity, ManyToOne, OneToMany, PrimaryColumn, Relation} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, Relation} from "typeorm";
 import {CreditCard} from "./credit-card";
 
 @Entity("GUEST")

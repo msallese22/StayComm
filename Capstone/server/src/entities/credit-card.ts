@@ -2,7 +2,7 @@ import {Guest} from "./guest";
 
 export { CreditCard }
 
-import {Column, Entity, ManyToOne, PrimaryColumn} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn} from "typeorm";
 
 @Entity("CREDIT_CARD")
 
@@ -21,5 +21,6 @@ class CreditCard
     creditCardCvv!: number;
 
     @ManyToOne(() => Guest, guest => guest.creditCards)
+    @JoinColumn({name: 'GUEST_ID'})
     guest!: Guest;
 }

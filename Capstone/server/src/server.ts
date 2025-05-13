@@ -71,7 +71,6 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const arrivingArrivals = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
-                .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
                 .getMany();
             if (!arrivingArrivals)
@@ -221,13 +220,10 @@ AppDataSource.initialize()//initializing where the database is to go!
         app.get('/guest-info/:id', async (req, res) =>
         {
             const id = +req.params.id;
-            /* const guest = await AppDataSource.getRepository(Guest).createQueryBuilder("guest")
+            const guest = await AppDataSource.getRepository(Guest).createQueryBuilder("guest")
                  .innerJoinAndSelect("guest.creditCards", "creditCard")
                  .where("guest.guestId = :id", {id: id})
-                 .getOne(); */
-            const guest = await AppDataSource.getRepository(Guest).findOneBy({
-                guestId: id
-            });
+                 .getOne();
             if (!guest)
             {
                 //truthy falsy.
@@ -269,17 +265,13 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const id = req.params.id;
 
-            const stayById = AppDataSource.getRepository(Stay).createQueryBuilder("stay")
-
+            const stayById = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
-                .innerJoinAndSelect("stay.guest.creditCard", "creditCard")
+                .innerJoinAndSelect("guest.creditCards", "creditCard")
                 .where("stay.stayId = :id", {id: id})
                 .getOne();
 
-            const stay = await AppDataSource.getRepository(Stay).findOneBy({
-                stayId: +id
-            });
-            if (!stay)
+            if (!stayById)
             {
                 res.status(404).json({
                     message: `Stay with ID ${id} not found.`

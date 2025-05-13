@@ -5,7 +5,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {StayInfo} from '../../../models/stay-info';
 import {StayService} from '../../../services/stay/stay.service';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-arrive-table',
@@ -22,6 +22,7 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
   @ViewChild(MatSort) sort!: MatSort;
 
   private stayService = inject(StayService);
+  private router = inject(Router);
 
   constructor()
   {
@@ -50,6 +51,11 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
     this.dataSource.sort = this.sort;
   }
 
+
+  editStay(stayId:number)
+  {
+      this.router.navigate(['/new-stay', {stayId: stayId, isEdit: true}]);
+  }
 
 
 

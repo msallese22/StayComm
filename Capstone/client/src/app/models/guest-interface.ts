@@ -7,5 +7,5 @@ export interface Guest{
   guestEmail: string;
   guestPhone: number;
   guestPassword: string;
-  creditCard: CreditCard;
+  creditCards: CreditCard[];
 }

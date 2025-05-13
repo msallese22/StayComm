@@ -49,18 +49,17 @@ import {CurrencyPipe} from '@angular/common';
 export class NewStayComponent implements OnInit
 {
   dialog = inject(MatDialog);
-  //router = inject(Router);
-  //stayService = inject(StayService);
+  router = inject(Router);
+  stayService = inject(StayService);
   guestService = inject(GuestService);
+  route = inject(ActivatedRoute)
   isNewStay:boolean = false;
   stay: StayInfo | null = null;
   modifiedStay: StayInfo = {} as StayInfo;
   ratesArray:Rate[] = [];
   totalCost:number = 0;
 
-  constructor(public route: ActivatedRoute, public stayService: StayService, public router: Router){}
-  //I might be messing everything up. let's find out?
-  // i know it's public by default, but it yelled at me if it wasn't SOMETHING so i made it something, jeez
+  constructor(){}
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -74,11 +73,7 @@ export class NewStayComponent implements OnInit
   roomType:string[] | null = ['King', 'Queen'];
 //ADD RESERVATION NOTES!
 
-private _isEdit:boolean = false;
-  @Input()
-  set isEdit(edit:boolean) {
-    this._isEdit = edit;
-  }
+
   newStayForm = new FormGroup({
 
     checkInDate: new FormControl('', [Validators.required]),
@@ -137,7 +132,10 @@ private _isEdit:boolean = false;
         this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
       });
 
-      if(this._isEdit)
+    const isEdit = this.route.snapshot.paramMap.get('isEdit');
+
+
+    if(isEdit)
       {
         const stayId = this.route.snapshot.paramMap.get('stayId');
 
@@ -147,20 +145,34 @@ private _isEdit:boolean = false;
           this.stayService.getStayById(+stayId).subscribe({
             next: (data) =>
             {
+
               this.stay = data;
               this.modifiedStay = {...data};
+              console.log(this.modifiedStay.guest.creditCards[0].creditCardExp);
+              let formattedCreditCardExp;
+              const creditCardExpDate = new Date(this.modifiedStay.guest.creditCards[0].creditCardExp);
+              if(creditCardExpDate.getMonth() < 10)
+              {
+                formattedCreditCardExp = `0${creditCardExpDate.getMonth()}${creditCardExpDate.getFullYear()}`
+              }
+              else
+              {
+                formattedCreditCardExp = `${creditCardExpDate.getMonth()}${creditCardExpDate.getFullYear()}`
+              }
+
 
               this.newStayForm.get("checkInDate")?.setValue(`${this.modifiedStay.stayCheckinDate}`)
               this.newStayForm.get("checkOutDate")?.setValue(`${this.modifiedStay.stayCheckoutDate}`)
               this.newStayForm.get("roomType")?.setValue(this.modifiedStay.roomType)
+              this.setRoomType(this.modifiedStay.roomType)
               this.guestInfoFormGroup.get("guestFirstName")?.setValue(this.modifiedStay.guest.guestFname);
               this.guestInfoFormGroup.get("guestLastName")?.setValue(this.modifiedStay.guest.guestLname);
               this.guestInfoFormGroup.get("guestPhone")?.setValue(this.modifiedStay.guest.guestPhone);
               this.guestInfoFormGroup.get("guestEmail")?.setValue(this.modifiedStay.guest.guestEmail);
 
-              this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(this.modifiedStay.guest.creditCard.creditCardNum);
-              this.creditCardInfoFormGroup.get("creditCardExp")?.setValue(this.modifiedStay.guest.creditCard.creditCardExp);
-              this.creditCardInfoFormGroup.get("creditCardCvv")?.setValue(this.modifiedStay.guest.creditCard.creditCardCvv);
+              this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(this.modifiedStay.guest.creditCards[0].creditCardNum);
+              this.creditCardInfoFormGroup.get("creditCardExp")?.setValue(formattedCreditCardExp);
+              this.creditCardInfoFormGroup.get("creditCardCvv")?.setValue(this.modifiedStay.guest.creditCards[0].creditCardCvv);
             }
           })
         }
@@ -206,6 +218,7 @@ private _isEdit:boolean = false;
 
 
 
+
   openDialog()
   {
     const formValue = this.newStayForm.value;
@@ -225,13 +238,13 @@ private _isEdit:boolean = false;
           guestEmail: guestFormGroupValue.guestEmail ? guestFormGroupValue.guestEmail:"",
           guestPhone: guestFormGroupValue.guestPhone ? guestFormGroupValue.guestPhone:"",
           guestPassword: this.guest? this.guest.guestPassword:"",
-          creditCard:
+          creditCards:[
             {
-              creditCardId: this.guest.creditCard ? this.guest.creditCard.creditCardId: 0,
+              creditCardId: this.guest.creditCards ? this.guest.creditCards[0].creditCardId: 0,
               creditCardNum: creditCardFormGroupValue.creditCardNum ? creditCardFormGroupValue.creditCardNum:"",
               creditCardExp: creditCardFormGroupValue.creditCardExp ? creditCardFormGroupValue.creditCardExp: new Date(),
               creditCardCvv: creditCardFormGroupValue.creditCardCvv ? creditCardFormGroupValue.creditCardCvv:""
-            }
+            }]
         },
 
     }
