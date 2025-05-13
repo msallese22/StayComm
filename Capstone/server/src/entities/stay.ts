@@ -25,6 +25,9 @@ class Stay
     @Column({name: 'ROOM_TYPE', type: 'char'})
     roomType!: string;
 
+    @Column({name: 'STAY_IS_CANCELED', type: 'boolean'})
+    stayIsCanceled!: boolean;
+
     @Column({name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
 

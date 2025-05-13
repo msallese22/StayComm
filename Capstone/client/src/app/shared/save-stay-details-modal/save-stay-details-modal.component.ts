@@ -27,5 +27,14 @@ export class SaveStayDetailsModalComponent
 {
   data = inject(MAT_DIALOG_DATA);
 
+}
 
+export class SaveStayModificationsModalComponent
+{
+  data = inject(MAT_DIALOG_DATA);
+}
+
+export class CancelStayModalComponent
+{
+  data = inject(MAT_DIALOG_DATA);
 }

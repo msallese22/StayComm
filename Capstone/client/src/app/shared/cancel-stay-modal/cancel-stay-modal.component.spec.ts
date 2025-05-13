@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManageStayComponent } from './manage-stay.component';
+import { CancelStayModalComponent } from './cancel-stay-modal.component';
 
-describe('ManageStayComponent', () => {
-  let component: ManageStayComponent;
-  let fixture: ComponentFixture<ManageStayComponent>;
+describe('CancelStayModalComponent', () => {
+  let component: CancelStayModalComponent;
+  let fixture: ComponentFixture<CancelStayModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManageStayComponent]
+      imports: [CancelStayModalComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ManageStayComponent);
+    fixture = TestBed.createComponent(CancelStayModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
