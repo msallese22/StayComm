@@ -66,9 +66,7 @@ export class NewStayComponent implements OnInit
   cancelYourStay: StayInfo = {} as StayInfo;
 
 
-  constructor()
-  {
-  }
+  constructor() {}
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -207,12 +205,18 @@ export class NewStayComponent implements OnInit
     this.ratesArray = [];
     if (this.newStayForm.get("checkInDate"))
     {
-      const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date;
+      console.log(this.newStayForm);
+      //getting the checkindate, making sure that's real and valid and not null.
+      const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date();
+
+
+      const checkOutDateExists = this.newStayForm.get("checkOutDate")!.value ? new Date(this.newStayForm.get("checkOutDate")!.value!) : new Date();
 
       if (this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
       {
         this.stayService.postRateList(checkInDateExists!, event.value!).subscribe(rates =>
         {
+          console.log(rates);
           this.ratesArray = rates;
           this.ratesArray.forEach(rate =>
           {

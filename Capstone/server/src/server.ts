@@ -29,6 +29,7 @@ AppDataSource.initialize()//initializing where the database is to go!
     {
         const d = new Date();
         const dateObject = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        //it's a dateObject because working with the dates directly? it hated it.
 
         console.log("Data source has been initialized!");
         app.get('/stay/departures', async (req, res) =>
@@ -242,14 +243,15 @@ AppDataSource.initialize()//initializing where the database is to go!
         //getting a list of ratePrices, returning the sum of them to the stay?
         app.post('/rate/rate-price', async (req, res) =>
         {
-
+            console.log(req.body);
             const checkinDate = new Date(req.body.checkinDate);
             const checkoutDate = new Date(req.body.checkoutDate);
 
 
+            //this is broken. somewhere
+
             const totalRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
-                .where("ratePrice.rateDate >= :checkinDate", {checkinDate: checkinDate})
-                .where("ratePrice.rateDate <= :checkoutDate", {checkoutDate: checkoutDate})
+                .where("ratePrice.rateDate >= :checkinDate AND ratePrice.rateDate <= :checkoutDate", {checkinDate: checkinDate, checkoutDate: checkoutDate})
                 .getMany();
             if (!totalRate)
             {
@@ -260,6 +262,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
             else
             {
+                console.log("Total rate", totalRate);
                 res.json(totalRate);
             }
         });
@@ -300,6 +303,7 @@ AppDataSource.initialize()//initializing where the database is to go!
                 });
                 return;
             }
+            //things going wrong right now-- pulling wrong dates, saving wrong dates, hates the dates
             stayRepository.merge(existingStay, stayData);//merging the changes to the thing itself!
             console.log(existingStay);
             console.log(stayData);
