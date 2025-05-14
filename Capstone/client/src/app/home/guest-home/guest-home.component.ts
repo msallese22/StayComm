@@ -1,17 +1,21 @@
-import { Component } from '@angular/core';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {Component, inject} from '@angular/core';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-guest-home',
   imports: [
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet
+
   ],
   templateUrl: './guest-home.component.html',
   standalone: true,
   styleUrl: './guest-home.component.css'
 })
 export class GuestHomeComponent {
+  private router = inject(Router);
 
+
+  newStay()
+  {
+    this.router.navigate(['/new-stay', { isEdit: false}]);
+  }
 }

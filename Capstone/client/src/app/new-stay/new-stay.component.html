@@ -152,7 +152,7 @@
       <button mat-raised-button class="book" (click)="openDialog()" [disabled]="newStayFormInvalid">{{ isNewStay ? "Book" : "Save Changes" }}</button>
       @if(!isNewStay)
       {
-        <button mat-raised-button class="cancel" formControlName="stayIsCanceled" (click)="cancelStay(true)"> Cancel Stay </button>
+        <button mat-raised-button class="cancel" (click)="cancelStay(true)"> Cancel Stay </button>
       }
     </div>
   </form>

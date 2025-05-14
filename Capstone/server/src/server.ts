@@ -33,10 +33,11 @@ AppDataSource.initialize()//initializing where the database is to go!
         console.log("Data source has been initialized!");
         app.get('/stay/departures', async (req, res) =>
         {
-            //then we tell it "hey, wait for us to tell you the query. the query type is findOneBy and then the productCode's id
-            const departureCount = await AppDataSource.getRepository(Stay).findAndCount({
-                where: {stayCheckoutDate: dateObject}
-            });
+            const departureCount = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .innerJoinAndSelect("stay.guest", "guest")
+                .where("stay.stayCheckoutDate = :today", {today: dateObject})
+                .andWhere("stay.stayIsCanceled = false")
+                .getCount();
             if (!departureCount)
             {
                 //truthy falsy.
@@ -46,15 +47,17 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
             else
             {
-                res.json(departureCount[1]);//send the product as a json response.
+                res.json(departureCount);//send the product as a json response.
             }
         });
         app.get('/stay/arrivals', async (req, res) =>
         {
             //then we tell it "hey, wait for us to tell you the query. the query type is findOneBy and then the productCode's id
-            const arrivalCount = await AppDataSource.getRepository(Stay).findAndCount({
-                where: {stayCheckinDate: dateObject}
-            });
+            const arrivalCount = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .innerJoinAndSelect("stay.guest", "guest")
+                .where("stay.stayCheckinDate = :today", {today: dateObject})
+                .andWhere("stay.stayIsCanceled = false")
+                .getCount();
             if (!arrivalCount)
             {
                 //truthy falsy.
@@ -64,7 +67,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
             else
             {
-                res.json(arrivalCount[1]);//send the product as a json response.
+                res.json(arrivalCount);//send the product as a json response.
             }
         });
         app.get('/stay/today-arrivals', async (req, res) =>
@@ -72,6 +75,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             const arrivingArrivals = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
+                .andWhere("stay.stayIsCanceled = false")
                 .getMany();
             if (!arrivingArrivals)
             {
@@ -89,8 +93,8 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const departingDepartures = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
-                .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayCheckoutDate = :today", {today: dateObject})
+                .andWhere("stay.stayIsCanceled = false")
                 .getMany();
             if (!departingDepartures)
             {
@@ -172,8 +176,8 @@ AppDataSource.initialize()//initializing where the database is to go!
                     || stayData[field] === null) ||
                 guestRequiredFields.some(field => stayData.guest[field] === undefined
                     || stayData.guest[field] === null)
-                || creditCardRequiredFields.some(field => stayData.guest.creditCard[field] === undefined
-                    || stayData.guest.creditCard[field] === null))
+                || creditCardRequiredFields.some(field => stayData.guest.creditCards[0][field] === undefined
+                    || stayData.guest.creditCards[0][field] === null))
             {
                 res.status(400).json({
                     message: 'Values are required for all columns'
@@ -182,7 +186,6 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
 
             const stayRepository: Repository<any> = AppDataSource.getRepository(Stay);
-            const roomRepository: Repository<any> = AppDataSource.getRepository(Room);
 
             if (stayData.guest.guestId === 0)
             {
@@ -190,9 +193,9 @@ AppDataSource.initialize()//initializing where the database is to go!
                 //make a new guest, bestie!
             }
 
-            if (stayData.guest.creditCard.creditCardId === 0)
+            if (stayData.guest.creditCards[0].creditCardId === 0)
             {
-                stayData.guest.creditCard.creditCardId = undefined;
+                stayData.guest.creditCards[0].creditCardId = undefined;
                 //smallest Russian doll
             }
 
@@ -298,6 +301,8 @@ AppDataSource.initialize()//initializing where the database is to go!
                 return;
             }
             stayRepository.merge(existingStay, stayData);//merging the changes to the thing itself!
+            console.log(existingStay);
+            console.log(stayData);
             try
             {
                 const updatedStay = await stayRepository.save(existingStay);

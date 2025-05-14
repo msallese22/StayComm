@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -27,6 +27,7 @@ export class EmpHomeComponent implements OnInit{
   arrivalCount = 0;
 
   private stayService = inject(StayService)
+  private router = inject(Router);
   ngOnInit()
   {
     this.stayService.getDepartureCount().subscribe(count => {
@@ -36,5 +37,10 @@ export class EmpHomeComponent implements OnInit{
     this.stayService.getArrivalCount().subscribe(count => {
       this.arrivalCount = count;
     })
+  }
+
+  newStay()
+  {
+    this.router.navigate(['/new-stay', { isEdit: false}]);
   }
 }

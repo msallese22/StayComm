@@ -4,7 +4,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
 import {
   SaveStayDetailsModalComponent,
-  SaveStayModificationsModalComponent
+
 } from '../shared/save-stay-details-modal/save-stay-details-modal.component';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatError, MatFormField, MatInput, MatLabel, MatSuffix} from '@angular/material/input';
@@ -25,6 +25,8 @@ import {StayInfo} from '../models/stay-info';
 import {Guest} from '../models/guest-interface';
 import {Rate} from '../models/rate';
 import {CurrencyPipe} from '@angular/common';
+import {AreYouSureModalComponent} from '../shared/are-you-sure-modal/are-you-sure-modal.component';
+import {CancelStayModalComponent} from '../shared/cancel-stay-modal/cancel-stay-modal.component';
 
 @Component({
   selector: 'app-new-stay',
@@ -100,7 +102,7 @@ export class NewStayComponent implements OnInit
       creditCardExp: new FormControl('', [Validators.required, Validators.maxLength(6), Validators.minLength(6)]),
       creditCardCvv: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(4)])
     }),
-    stayIsCanceled: new FormControl(false, [Validators.required])
+    stayIsCanceled: new FormControl(false)
   });
 
   private guest!: Guest;
@@ -160,7 +162,6 @@ export class NewStayComponent implements OnInit
 
             this.stay = data;
             this.modifiedStay = {...data};
-            console.log(this.modifiedStay.guest.creditCards[0].creditCardExp);
             let formattedCreditCardExp;
             const creditCardExpDate = new Date(this.modifiedStay.guest.creditCards[0].creditCardExp);
             if (creditCardExpDate.getMonth() < 10)
@@ -187,6 +188,8 @@ export class NewStayComponent implements OnInit
             this.creditCardInfoFormGroup.get("creditCardCvv")?.setValue(this.modifiedStay.guest.creditCards[0].creditCardCvv);
 
             this.newStayForm.get("stayIsCanceled")?.setValue(this.modifiedStay.stayIsCanceled);
+
+            this.newStayForm.updateValueAndValidity();
           }
         });
       }
@@ -234,7 +237,46 @@ export class NewStayComponent implements OnInit
   {
     this.newStayForm.get("stayIsCanceled")?.setValue(stayIsCanceled);
 
-    this.canceledStay = false;
+    this.canceledStay = true;
+
+    const dialogRef = this.dialog.open(AreYouSureModalComponent, {
+      data: {
+        isCreate: false,
+        stayId: this.modifiedStay.stayId,
+        checkInDate: this.modifiedStay.stayCheckinDate,
+        checkOutDate: this.modifiedStay.stayCheckoutDate,
+        isCanceled: this.modifiedStay.stayIsCanceled,
+        roomType: this.newStayForm.get('roomType')?.value
+      }, height: '400px',
+      width: '500px',
+      panelClass: "style-modal"
+    });
+    dialogRef.afterClosed().subscribe((result: boolean) =>
+    {
+      if (result)
+      {
+        this.modifiedStay.stayIsCanceled = this.newStayForm.get("stayIsCanceled") ? this.newStayForm.get("stayIsCanceled")!.value! : false;
+        this.stayService.updateStay(this.modifiedStay).subscribe(data =>
+        {
+          const dialogRef = this.dialog.open(CancelStayModalComponent, {
+            data: {
+              isCreate: false,
+              stayId: this.modifiedStay.stayId,
+              checkInDate: this.modifiedStay.stayCheckinDate,
+              checkOutDate: this.modifiedStay.stayCheckoutDate,
+              isCanceled: this.modifiedStay.stayIsCanceled,
+              roomType: this.newStayForm.get('roomType')?.value
+            }, height: '400px',
+            width: '500px',
+            panelClass: "style-modal"
+          });
+          dialogRef.afterClosed().subscribe(() =>
+          {
+            this.router.navigateByUrl("/home");
+          });
+        });
+      }
+    });
   }
 
 
@@ -291,36 +333,14 @@ export class NewStayComponent implements OnInit
     }
     else if (this.modifiedStay)
     {
-      this.stayService.createNewStay(this.modifiedStay).subscribe(data =>
+      this.stayService.updateStay(this.modifiedStay).subscribe(data =>
       {
-        const dialogRef = this.dialog.open(SaveStayModificationsModalComponent, {
+        const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
           data: {
             isCreate: false,
             stayId: data.stayId,
             checkInDate: data.stayCheckinDate,
             checkOutDate: data.stayCheckoutDate,
-            roomType: this.newStayForm.get('roomType')?.value
-          }, height: '400px',
-          width: '500px',
-          panelClass: "style-modal"
-        });
-        dialogRef.afterClosed().subscribe(() =>
-        {
-          this.router.navigateByUrl("/home");
-        });
-      });
-    }
-    else
-    {
-      this.stayService.createNewStay(this.cancelYourStay).subscribe(data =>
-      {
-        const dialogRef = this.dialog.open(SaveStayModificationsModalComponent, {
-          data: {
-            isCreate: false,
-            stayId: data.stayId,
-            checkInDate: data.stayCheckinDate,
-            checkOutDate: data.stayCheckoutDate,
-            isCanceled: data.stayIsCanceled,
             roomType: this.newStayForm.get('roomType')?.value
           }, height: '400px',
           width: '500px',

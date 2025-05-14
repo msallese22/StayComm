@@ -49,4 +49,8 @@ export class StayService {
     return this.http.get<StayInfo>(`${this.url}/stay/${stayId}`);
   }
 
+  updateStay(stay: StayInfo): Observable<StayInfo>{
+    return this.http.put<StayInfo>(`${this.url}/stay/${stay.stayId}`, stay);
+  }
+
 }

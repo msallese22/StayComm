@@ -1,7 +1,7 @@
 
-<h1 mat-dialog-title class="center-text">Your Stay has been Canceled</h1>
+<h1 mat-dialog-title class="center-text">Are you Sure?</h1>
 <mat-dialog-content>
-  <h2 class="center-text">We hope to host you again!</h2>
+  <h2 class="center-text">This will cancel your stay. If you change your mind, you'll have to rebook your stay later.</h2>
   <p class="center-text bigger-text">Checking in: {{ data.checkInDate | date:"fullDate" }} <br/><br/> Checking
     out: {{ data.checkOutDate | date: "fullDate" }}</p>
   <p class="center-text bigger-text">Room Type: {{ data.roomType }} Suite</p>
@@ -9,5 +9,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="fix-button">
-  <button mat-button mat-dialog-close class="modal-button">Continue</button>
+  <button mat-button [mat-dialog-close]="true" class="modal-button">Confirm</button>
+  <button mat-button [mat-dialog-close]="false" class="modal-button">Back</button>
 </mat-dialog-actions>
