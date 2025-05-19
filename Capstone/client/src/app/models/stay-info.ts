@@ -6,6 +6,7 @@ export interface StayInfo{
   stayCheckoutDate: Date;
   roomType: string;
   stayIsCanceled: boolean;
+  stayIsCheckedIn: boolean;
   //propertyId: number;
   guest: Guest
 }

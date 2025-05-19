@@ -240,6 +240,8 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(guest);//send the product as a json response.
             }
         });
+
+
         //getting a list of ratePrices, returning the sum of them to the stay?
         app.post('/rate/rate-price', async (req, res) =>
         {
@@ -247,24 +249,55 @@ AppDataSource.initialize()//initializing where the database is to go!
             const checkinDate = new Date(req.body.checkinDate);
             const checkoutDate = new Date(req.body.checkoutDate);
 
+            checkoutDate.setDate(checkoutDate.getDate() - 1);
+
 
             //this is broken. somewhere
+
 
             const totalRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
                 .where("ratePrice.rateDate >= :checkinDate AND ratePrice.rateDate <= :checkoutDate", {checkinDate: checkinDate, checkoutDate: checkoutDate})
                 .getMany();
-            if (!totalRate)
+            const defaultRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
+                .where("ratePrice.rateDate = :checkinDate", {checkinDate: "1901-11-11"})
+                .getOne();
+
+            const dates = getDatesInRange(checkinDate, checkoutDate)
+            const totalCost:RatePrice[] = [];
+
+            if(totalRate)
             {
-                const defaultRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
-                    .where("ratePrice.rateDate = :checkinDate", {checkinDate: new Date("1901-11-11")})
-                    .getMany();
-                res.json(defaultRate);
+
+                for(let i = 0; i < dates.length; i++)
+                {
+                    const matchingRate = totalRate.find(rate => rate.rateDate === dates[i])
+                    if(matchingRate)
+                    {
+                        totalCost.push(matchingRate)
+                    }
+                    else
+                    {
+                        totalCost.push({
+                            rateDate: dates[i],
+                            ratePricePrice: defaultRate!.ratePricePrice,
+                            ratePriceId: 0,
+                            stays:[]
+                        });
+                    }
+                }
             }
             else
             {
-                console.log("Total rate", totalRate);
-                res.json(totalRate);
+                dates.forEach(date => {
+                    totalCost.push({
+                        rateDate: date,
+                        ratePricePrice: defaultRate!.ratePricePrice,
+                        ratePriceId: 0,
+                        stays:[]
+                    });
+                });
             }
+            res.json(totalCost);
         });
 
         app.get('/stay/:id', async (req, res) =>
@@ -321,3 +354,18 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
         })
     });
+
+
+function getDatesInRange(checkinDate:Date, checkoutDate:Date) {
+    const date = new Date(checkinDate.getTime());
+
+    const dates = [];
+
+    while (date <= checkoutDate) {
+        dates.push(new Date(date));
+        date.setDate(date.getDate() + 1);
+    }
+
+    return dates;
+}
+

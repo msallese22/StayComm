@@ -12,7 +12,7 @@ class RatePrice
     @PrimaryColumn({name: 'RATE_PRICE_ID', type: 'int', unsigned: true})
     ratePriceId!: number;
 
-    @Column({name: 'RATE_PRICE_PRICE', type: 'decimal', unsigned: true})
+    @Column({name: 'RATE_PRICE_PRICE', type: 'decimal', nullable: true ,unsigned: true, default: 99})
     ratePricePrice!: number;
 
     @Column({name: 'RATE_DATE', type: 'date'})

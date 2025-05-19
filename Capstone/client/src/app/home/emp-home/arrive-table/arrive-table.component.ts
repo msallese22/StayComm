@@ -52,18 +52,16 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
   }
 
 
-  editStay(stayId:number)
+  checkInStay(stayId:number)
   {
-      this.router.navigate(['/new-stay', {stayId: stayId, isEdit: true}]);
+      this.router.navigate(['/new-stay', {stayId: stayId, formType: "checkIn"}]);
   }
-
 
 
   applyFilter(event: Event)
   {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
   }
 }
 

@@ -10,7 +10,7 @@
 }
 
 .search-bar {
-  width: 100%;
+  width: auto;
   height: 25px;
   background-color: #ff69b1;
   display: flex;

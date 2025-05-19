@@ -63,7 +63,8 @@ export class NewStayComponent implements OnInit
   modifiedStay: StayInfo = {} as StayInfo;
   ratesArray: Rate[] = [];
   totalCost: number = 0;
-  cancelYourStay: StayInfo = {} as StayInfo;
+  buttonText: string = "";
+  formType:string = "";
 
 
   constructor() {}
@@ -120,6 +121,7 @@ export class NewStayComponent implements OnInit
     return this.newStayForm.invalid;
   }
 
+
   ngOnInit(): void
   {
     this.creditCardInfoFormGroup.get("creditCardNumber")?.valueChanges.subscribe(value =>
@@ -144,10 +146,10 @@ export class NewStayComponent implements OnInit
       this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
     });
 
-    const isEdit = this.route.snapshot.paramMap.get('isEdit');
+    this.formType = this.route.snapshot.paramMap.get('formType')!;
 
 
-    if (isEdit)
+    if (this.formType === "edit" || this.formType === "checkIn" || this.formType === "checkOut")
     {
       const stayId = this.route.snapshot.paramMap.get('stayId');
 
@@ -171,7 +173,6 @@ export class NewStayComponent implements OnInit
               formattedCreditCardExp = `${creditCardExpDate.getMonth()}${creditCardExpDate.getFullYear()}`;
             }
 
-
             this.newStayForm.get("checkInDate")?.setValue(`${this.modifiedStay.stayCheckinDate}`);
             this.newStayForm.get("checkOutDate")?.setValue(`${this.modifiedStay.stayCheckoutDate}`);
             this.newStayForm.get("roomType")?.setValue(this.modifiedStay.roomType);
@@ -190,12 +191,25 @@ export class NewStayComponent implements OnInit
             this.newStayForm.updateValueAndValidity();
           }
         });
+        this.buttonText = "Save Changes";
+
+        if(this.formType === "checkIn")
+        {
+          this.newStayForm.get("checkInDate")?.disable();
+          this.buttonText = "Check In";
+        }
+        else if(this.formType === "checkOut")
+        {
+          this.newStayForm.disable();
+          this.buttonText = "Check Out";
+        }
       }
-      else
-      {
-        this.isNewStay = true;
-        this.modifiedStay = {} as StayInfo;
-      }
+    }
+    else
+    {
+      this.isNewStay = true;
+      this.modifiedStay = {} as StayInfo;
+      this.buttonText = "Book New Stay";
     }
   }
 
@@ -233,6 +247,7 @@ export class NewStayComponent implements OnInit
   setRoomType(roomType: string)
   {
     this.newStayForm.get("roomType")?.setValue(roomType);
+    this.newStayForm.updateValueAndValidity();
 
     this.king = roomType === 'K';
   }
@@ -311,7 +326,8 @@ export class NewStayComponent implements OnInit
               creditCardCvv: creditCardFormGroupValue.creditCardCvv ? creditCardFormGroupValue.creditCardCvv : ""
             }]
         },
-      stayIsCanceled: formValue.stayIsCanceled ? formValue.stayIsCanceled : false
+      stayIsCanceled: formValue.stayIsCanceled ? formValue.stayIsCanceled : false,
+      stayIsCheckedIn: false
 
     };
     if (this.isNewStay)
@@ -320,7 +336,7 @@ export class NewStayComponent implements OnInit
       {
         const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
           data: {
-            isCreate: true,
+            formType: this.formType,
             stayId: data.stayId,
             checkInDate: data.stayCheckinDate,
             checkOutDate: data.stayCheckoutDate,
@@ -337,11 +353,15 @@ export class NewStayComponent implements OnInit
     }
     else if (this.modifiedStay)
     {
+      if(this.formType === 'checkIn')
+      {
+        this.modifiedStay.stayIsCheckedIn = true;
+      }
       this.stayService.updateStay(this.modifiedStay).subscribe(data =>
       {
         const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
           data: {
-            isCreate: false,
+            formType: this.formType,
             stayId: data.stayId,
             checkInDate: data.stayCheckinDate,
             checkOutDate: data.stayCheckoutDate,
