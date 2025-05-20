@@ -1,15 +1,31 @@
 <div>
 @if(stay || isNewStay)
 {
-  @if(isNewStay)
+  @if(formType === "edit")
+  {
+    <div class="new">
+      Manage Stay
+    </div>
+  } @else if(formType === "checkIn")
+  {
+    <div class="new">
+       Checking In
+    </div>
+  } @else if(formType === "checkOut")
+  {
+    <div class="new">
+      Checking Out Room #
+    </div>
+  } @else if(formType === "inHouseGuests")
+  {
+    <div class="new">
+      Room #
+    </div>
+  }
+  @else
   {
     <div class="new">
       Book a New Stay
-    </div>
-  } @else if(stay)
-  {
-    <div class="new">
-       Manage Stay
     </div>
   }
 

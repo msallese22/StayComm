@@ -25,6 +25,7 @@ export class EmpHomeComponent implements OnInit{
 
   departureCount = 0;
   arrivalCount = 0;
+  checkedInCount = 0;
 
   private stayService = inject(StayService)
   private router = inject(Router);
@@ -37,10 +38,19 @@ export class EmpHomeComponent implements OnInit{
     this.stayService.getArrivalCount().subscribe(count => {
       this.arrivalCount = count;
     })
+
+    this.stayService.getCheckedInCount().subscribe(count => {
+      this.checkedInCount = count;
+    })
   }
 
   newStay()
   {
-    this.router.navigate(['/new-stay', { isEdit: false}]);
+    this.router.navigate(['/new-stay', {isEdit: false}]);
+  }
+
+  routeToTable(tableType:string)
+  {
+    this.router.navigate(['/master-table', {tableType: tableType}])
   }
 }

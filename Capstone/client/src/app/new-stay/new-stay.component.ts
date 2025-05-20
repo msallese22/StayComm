@@ -64,10 +64,12 @@ export class NewStayComponent implements OnInit
   ratesArray: Rate[] = [];
   totalCost: number = 0;
   buttonText: string = "";
-  formType:string = "";
+  formType: string = "";
 
 
-  constructor() {}
+  constructor()
+  {
+  }
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -146,10 +148,11 @@ export class NewStayComponent implements OnInit
       this.guestInfoFormGroup.get("guestEmail")?.setValue(data.guestEmail);
     });
 
+
     this.formType = this.route.snapshot.paramMap.get('formType')!;
 
-
-    if (this.formType === "edit" || this.formType === "checkIn" || this.formType === "checkOut")
+    if (this.formType === "edit" || this.formType === "checkIn" || this.formType === "checkOut"
+      || this.formType === "inHouseGuests")
     {
       const stayId = this.route.snapshot.paramMap.get('stayId');
 
@@ -193,15 +196,20 @@ export class NewStayComponent implements OnInit
         });
         this.buttonText = "Save Changes";
 
-        if(this.formType === "checkIn")
+        if (this.formType === "checkIn")
         {
           this.newStayForm.get("checkInDate")?.disable();
           this.buttonText = "Check In";
         }
-        else if(this.formType === "checkOut")
+        else if (this.formType === "checkOut")
         {
           this.newStayForm.disable();
           this.buttonText = "Check Out";
+        }
+        else if (this.formType === "inHouseGuests")
+        {
+          this.newStayForm.disable();
+          this.buttonText = "Home";
         }
       }
     }
@@ -353,28 +361,36 @@ export class NewStayComponent implements OnInit
     }
     else if (this.modifiedStay)
     {
-      if(this.formType === 'checkIn')
+      if (this.formType === 'inHouseGuests')
       {
-        this.modifiedStay.stayIsCheckedIn = true;
+        this.router.navigate(['/home']);
       }
-      this.stayService.updateStay(this.modifiedStay).subscribe(data =>
+      else
       {
-        const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
-          data: {
-            formType: this.formType,
-            stayId: data.stayId,
-            checkInDate: data.stayCheckinDate,
-            checkOutDate: data.stayCheckoutDate,
-            roomType: this.newStayForm.get('roomType')?.value
-          }, height: '400px',
-          width: '500px',
-          panelClass: "style-modal"
-        });
-        dialogRef.afterClosed().subscribe(() =>
+        if (this.formType === 'checkIn')
         {
-          this.router.navigateByUrl("/home");
+          this.modifiedStay.stayIsCheckedIn = true;
+        }
+
+        this.stayService.updateStay(this.modifiedStay).subscribe(data =>
+        {
+          const dialogRef = this.dialog.open(SaveStayDetailsModalComponent, {
+            data: {
+              formType: this.formType,
+              stayId: data.stayId,
+              checkInDate: data.stayCheckinDate,
+              checkOutDate: data.stayCheckoutDate,
+              roomType: this.newStayForm.get('roomType')?.value
+            }, height: '400px',
+            width: '500px',
+            panelClass: "style-modal"
+          });
+          dialogRef.afterClosed().subscribe(() =>
+          {
+            this.router.navigateByUrl("/home");
+          });
         });
-      });
+      }
     }
   }
 }

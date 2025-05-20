@@ -57,6 +57,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             const arrivalCount = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
+                .andWhere("stay.stayIsCheckedIn = false")
                 .andWhere("stay.stayIsCanceled = false")
                 .getCount();
             if (!arrivalCount)
@@ -109,6 +110,44 @@ AppDataSource.initialize()//initializing where the database is to go!
                 res.json(departingDepartures);//send the product as a json response.
             }
         });
+
+        app.get('/stay/checked-in-count', async (req, res) =>
+        {
+            const inHouseCount = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .where("stay.stayIsCheckedIn = true")
+                .getCount();
+            if (!inHouseCount)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `No check ins for today found :(`
+                });
+            }
+            else
+            {
+                res.json(inHouseCount);//send the product as a json response.
+            }
+        });
+
+        app.get('/stay/checked-in-stays', async (req, res) =>
+        {
+            const checkedInGuests = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .innerJoinAndSelect("stay.guest", "guest")
+                .where("stay.stayIsCheckedIn = true")
+                .getMany();
+            if (!checkedInGuests)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `No check ins found :(`
+                });
+            }
+            else
+            {
+                res.json(checkedInGuests);//send the product as a json response.
+            }
+        });
+
         app.get('/room/room-status', async (req, res) =>
         {
             const roomStatus = await AppDataSource.getRepository(Room).find();
@@ -225,9 +264,9 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const id = +req.params.id;
             const guest = await AppDataSource.getRepository(Guest).createQueryBuilder("guest")
-                 .innerJoinAndSelect("guest.creditCards", "creditCard")
-                 .where("guest.guestId = :id", {id: id})
-                 .getOne();
+                .innerJoinAndSelect("guest.creditCards", "creditCard")
+                .where("guest.guestId = :id", {id: id})
+                .getOne();
             if (!guest)
             {
                 //truthy falsy.
@@ -256,24 +295,27 @@ AppDataSource.initialize()//initializing where the database is to go!
 
 
             const totalRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
-                .where("ratePrice.rateDate >= :checkinDate AND ratePrice.rateDate <= :checkoutDate", {checkinDate: checkinDate, checkoutDate: checkoutDate})
+                .where("ratePrice.rateDate >= :checkinDate AND ratePrice.rateDate <= :checkoutDate", {
+                    checkinDate: checkinDate,
+                    checkoutDate: checkoutDate
+                })
                 .getMany();
             const defaultRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
                 .where("ratePrice.rateDate = :checkinDate", {checkinDate: "1901-11-11"})
                 .getOne();
 
-            const dates = getDatesInRange(checkinDate, checkoutDate)
-            const totalCost:RatePrice[] = [];
+            const dates = getDatesInRange(checkinDate, checkoutDate);
+            const totalCost: RatePrice[] = [];
 
-            if(totalRate)
+            if (totalRate)
             {
 
-                for(let i = 0; i < dates.length; i++)
+                for (let i = 0; i < dates.length; i++)
                 {
-                    const matchingRate = totalRate.find(rate => rate.rateDate === dates[i])
-                    if(matchingRate)
+                    const matchingRate = totalRate.find(rate => rate.rateDate === dates[i]);
+                    if (matchingRate)
                     {
-                        totalCost.push(matchingRate)
+                        totalCost.push(matchingRate);
                     }
                     else
                     {
@@ -281,19 +323,20 @@ AppDataSource.initialize()//initializing where the database is to go!
                             rateDate: dates[i],
                             ratePricePrice: defaultRate!.ratePricePrice,
                             ratePriceId: 0,
-                            stays:[]
+                            stays: []
                         });
                     }
                 }
             }
             else
             {
-                dates.forEach(date => {
+                dates.forEach(date =>
+                {
                     totalCost.push({
                         rateDate: date,
                         ratePricePrice: defaultRate!.ratePricePrice,
                         ratePriceId: 0,
-                        stays:[]
+                        stays: []
                     });
                 });
             }
@@ -322,14 +365,15 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
         });
 
-        app.put('/stay/:id', async(req, res) => {
+        app.put('/stay/:id', async (req, res) =>
+        {
             const id = req.params.id;
             const stayData = req.body;
-            const stayRepository= AppDataSource.getRepository(Stay);
+            const stayRepository = AppDataSource.getRepository(Stay);
             const existingStay = await stayRepository.findOneBy({
                 stayId: +id
             });
-            if(!existingStay)
+            if (!existingStay)
             {
                 res.status(404).json({
                     message: `Stay with id ${id} not found`
@@ -345,23 +389,25 @@ AppDataSource.initialize()//initializing where the database is to go!
                 const updatedStay = await stayRepository.save(existingStay);
                 res.json(updatedStay);
             }
-            catch(error)
+            catch (error)
             {
                 console.error('Error updating stay: ', error);
                 res.status(500).json({
                     message: 'Failed to update stay'
                 });
             }
-        })
+        });
     });
 
 
-function getDatesInRange(checkinDate:Date, checkoutDate:Date) {
+function getDatesInRange(checkinDate: Date, checkoutDate: Date)
+{
     const date = new Date(checkinDate.getTime());
 
     const dates = [];
 
-    while (date <= checkoutDate) {
+    while (date <= checkoutDate)
+    {
         dates.push(new Date(date));
         date.setDate(date.getDate() + 1);
     }

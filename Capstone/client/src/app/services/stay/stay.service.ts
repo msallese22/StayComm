@@ -21,6 +21,16 @@ export class StayService {
     return this.http.get<number>(`${this.url}/stay/arrivals`);
   }
 
+  getCheckedInCount(): Observable<number>
+  {
+    return this.http.get<number>(`${this.url}/stay/checked-in-count`);
+  }
+
+  getCheckedInInfo()
+  {
+    return this.http.get<StayInfo[]>(`${this.url}/stay/checked-in-stays`);
+  }
+
   getArrivalInfo()
   {
     return this.http.get<StayInfo[]>(`${this.url}/stay/today-arrivals`);

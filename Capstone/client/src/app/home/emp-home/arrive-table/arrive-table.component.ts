@@ -5,7 +5,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {StayInfo} from '../../../models/stay-info';
 import {StayService} from '../../../services/stay/stay.service';
-import {Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-arrive-table',
@@ -18,20 +18,24 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
 {
   displayedColumns: string[] = ['guestLname', 'stayId', 'roomId', 'stayCheckinDate', 'stayCheckoutDate'];
   dataSource: MatTableDataSource<StayInfo>;
+  tableType: string = "";
 
   @ViewChild(MatSort) sort!: MatSort;
 
   private stayService = inject(StayService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   constructor()
   {
-
     this.dataSource = new MatTableDataSource();
   }
 
   ngOnInit()
   {
+    this.tableType = this.route.snapshot.paramMap.get('tableType')!;
+
     this.dataSource.filterPredicate = (data: StayInfo, filter: string) =>
     {
       console.log(filter);
@@ -39,11 +43,32 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
       return data.guest.guestLname.toLowerCase().includes(filter) ||
         stringStayId.includes(filter);
     }
-    this.stayService.getArrivalInfo().subscribe(arrivers =>
+    if (this.tableType === "arrivers")
     {
-      this.dataSource.data = arrivers;
+      this.stayService.getArrivalInfo().subscribe(arrivers =>
+      {
+        this.dataSource.data = arrivers;
 
-    });
+      });
+    }
+    else if (this.tableType === "departers")
+    {
+      this.stayService.getDepartureInfo().subscribe(departers =>
+      {
+        this.dataSource.data = departers;
+
+      });
+    }
+    else if(this.tableType === "inHouseGuests")
+    {
+      this.stayService.getCheckedInInfo().subscribe(inHouseGuests =>
+      {
+        this.dataSource.data = inHouseGuests;
+      });
+    }
+
+
+
   }
 
   ngAfterViewInit()
@@ -52,9 +77,21 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
   }
 
 
-  checkInStay(stayId:number)
+  navigate(stayId:number)
   {
-      this.router.navigate(['/new-stay', {stayId: stayId, formType: "checkIn"}]);
+
+      if(this.tableType === "arrivers")
+      {
+        this.router.navigate(['/new-stay', {stayId: stayId, formType: "checkIn"}]);
+      }
+      else if(this.tableType === "departers")
+      {
+        this.router.navigate(['/new-stay', {stayId: stayId, formType: "checkOut"}])
+      }
+      else if(this.tableType === "inHouseGuests")
+      {
+        this.router.navigate(['/new-stay', {stayId: stayId, formType: "inHouseGuests"}])
+      }
   }
 
 

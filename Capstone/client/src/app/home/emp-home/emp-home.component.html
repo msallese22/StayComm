@@ -15,11 +15,11 @@
       Today's Outlook
     </div>
     <div class="square-container">
-      <a class="arrivals small-square-shapes" routerLink="/today-arrivals">
+      <a (click)="routeToTable('arrivers')" class="arrivals small-square-shapes">
         Arrivals
         {{arrivalCount}}
       </a>
-      <a class="departures small-square-shapes" routerLink="/today-departures">
+      <a (click)="routeToTable('departers')" class="departures small-square-shapes">
         Departures
         {{departureCount}}
       </a>
@@ -29,9 +29,9 @@
       </div>
     </div>
     <div class="square-container">
-      <a class="house-guests big-rectangles">
+      <a class="house-guests big-rectangles" (click)="routeToTable('inHouseGuests')">
         In House Guests
-        [X]
+        {{checkedInCount}}
       </a>
       <a (click)="newStay()" class="new-stay big-rectangles">
         Book a New Stay
