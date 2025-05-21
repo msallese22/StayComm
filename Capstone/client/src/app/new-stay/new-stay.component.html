@@ -96,10 +96,12 @@
     <div class="bottom-row">
       <div class="room-type">
         <p>Select A Room Type</p>
+        <div class="position-buttons">
         <button mat-raised-button class="king" [disabled]="king===true" (click)="setRoomType('K')">King Suite
         </button>
         <button mat-raised-button class="queen" [disabled]="king===false" (click)="setRoomType('Q')">Queen Suite
         </button>
+        </div>
         @if (king === true) {
           <p>You've selected a King Suite</p>
         }
@@ -107,6 +109,9 @@
           <p>You've selected a Queen Suite</p>
         } @else {
           <p></p>
+        }
+        @if (formType === "checkIn") {
+          <button mat-raised-button class="assign-room" (click)="routeToRoomTable()">Assign a Room</button>
         }
         <mat-icon class="info"
                   matTooltip="Our King Suite will have a single King size bed and a sofa bed. Our Queen Suite has two Queen size beds and a sofa bed.">

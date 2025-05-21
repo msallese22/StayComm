@@ -79,6 +79,8 @@ export class NewStayComponent implements OnInit
 
   canceledStay?: boolean | null = null;
 
+  assignedRoom?: number | null = null;
+
   toolTipMessage: string = "Your broken down total rate is: \n";
   //and for some reason it's not putting the stuff on new lines every time. does it need to be a for loop???
 
@@ -165,6 +167,8 @@ export class NewStayComponent implements OnInit
 
             this.stay = data;
             this.modifiedStay = {...data};
+            //Nick sending it the whole stay object so it can sign to whole thing instead of just part of the thing
+            this.stayService.currentStay = this.stay;
             let formattedCreditCardExp;
             const creditCardExpDate = new Date(this.modifiedStay.guest.creditCards[0].creditCardExp);
             if (creditCardExpDate.getMonth() < 10)
@@ -231,8 +235,6 @@ export class NewStayComponent implements OnInit
       //getting the checkindate, making sure that's real and valid and not null.
       const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date();
 
-
-      const checkOutDateExists = this.newStayForm.get("checkOutDate")!.value ? new Date(this.newStayForm.get("checkOutDate")!.value!) : new Date();
 
       if (this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
       {
@@ -306,6 +308,11 @@ export class NewStayComponent implements OnInit
     });
   }
 
+
+  routeToRoomTable()
+  {
+    this.router.navigate(['/room-status', {roomFormType: "block", stayId: this.stay!.stayId}]);
+  }
 
   openDialog(): void
   {

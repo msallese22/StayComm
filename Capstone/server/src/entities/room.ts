@@ -23,7 +23,8 @@ class Room
     @Column({ name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
 
-    @ManyToOne(() => Stay, stay => stay.room)
+    //problem might be here, Nick?
+    @ManyToOne(() => Stay, stay => stay.room, {cascade:["update"]})
     @JoinColumn({name: 'STAY_ID'})
     stays!: Stay;
 }

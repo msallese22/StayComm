@@ -186,6 +186,39 @@ AppDataSource.initialize()//initializing where the database is to go!
             const savedRoomList = await roomStatus.find();
             res.json(savedRoomList);
         });
+        //Nick is put request right
+        app.put('/room/assign-a-room/:id', async (req, res ) =>
+        {
+            const id = req.params.id;
+            const roomData = req.body;
+            const roomRepository = AppDataSource.getRepository(Room);
+            const existingRoom = await roomRepository.findOneBy({
+                roomId: +id
+            });
+            if (!existingRoom)
+            {
+                res.status(404).json({
+                    message: `Stay with id ${id} not found`
+                });
+                return;
+            }
+
+            roomRepository.merge(existingRoom, roomData);
+            console.log(roomData);
+
+            try
+            {
+                const updatedRoom = await roomRepository.save(existingRoom);
+                res.json(updatedRoom);
+            }
+            catch (error)
+            {
+                console.error('Error updating room: ', error);
+                res.status(500).json({
+                    message: 'Failed to update room'
+                });
+            }
+        });
         app.post('/stay/save-new-stay/', async (req, res) =>
         {
             const stayData = req.body;
@@ -380,10 +413,9 @@ AppDataSource.initialize()//initializing where the database is to go!
                 });
                 return;
             }
-            //things going wrong right now-- pulling wrong dates, saving wrong dates, hates the dates
-            stayRepository.merge(existingStay, stayData);//merging the changes to the thing itself!
-            console.log(existingStay);
-            console.log(stayData);
+
+            stayRepository.merge(existingStay, stayData);
+
             try
             {
                 const updatedStay = await stayRepository.save(existingStay);

@@ -43,9 +43,15 @@
     <ng-container matColumnDef="changeRoomIsClean">
       <th mat-header-cell *matHeaderCellDef>Update Status</th>
       <td mat-cell *matCellDef="let row">
-        <mat-checkbox [checked]="row.roomIsClean" (change)="updateRoomStatus($event, row.roomId)">
-          Clean
-        </mat-checkbox>
+        @if(roomFormType === "change")
+        {
+          <mat-checkbox [checked]="row.roomIsClean" (change)="updateRoomStatus($event, row.roomId)">
+            Clean
+          </mat-checkbox>
+        } @else if (roomFormType === "block")
+        {
+          <button mat-button [disabled]="row.roomIsBlocked" (click)="assignStayToRoom(row.roomId)">Assign</button>
+        }
       </td>
     </ng-container>
 

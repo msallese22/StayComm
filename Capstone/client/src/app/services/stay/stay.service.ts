@@ -8,6 +8,8 @@ import {Rate} from '../../models/rate';
   providedIn: 'root'
 })
 export class StayService {
+
+  currentStay!:StayInfo;
   private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 

@@ -37,7 +37,8 @@ class Stay
     //creates a new type, fixes the circular dependency wowowowow
 
     //when you save a stay, update the room, too.
-    @OneToMany(() => Room, room => room.stays, {cascade:true})
+    //which side should the cascade go on
+    @OneToMany(() => Room, room => room.stays)
     @JoinColumn({name: 'STAY_ID'})
     room!: Room;
 

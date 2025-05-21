@@ -12,11 +12,14 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatSort} from '@angular/material/sort';
 import {Room} from '../../../models/room-status';
 import {RoomService} from '../../../services/room/room.service';
+import {StayService} from '../../../services/stay/stay.service';
+import {StayInfo} from '../../../models/stay-info';
 import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 import {MatButtonToggle, MatButtonToggleChange, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
 import {MatButton} from '@angular/material/button';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-manage-room-status',
@@ -53,8 +56,13 @@ export class ManageRoomStatusComponent  implements OnInit
 {
   cleanFilter = new FormControl("");
   typeFilter = new FormControl("");
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+
 
   room: RoomService | null = null;
+
+  stay: StayService | null = null;
 
   displayedColumns: string[] = ['roomId', 'roomIsClean', 'changeRoomIsClean'];
   dataSource: MatTableDataSource<Room>;
@@ -63,11 +71,17 @@ export class ManageRoomStatusComponent  implements OnInit
 
   private roomService = inject(RoomService);
 
+  stayService = inject(StayService);
+
+  stayId:number = 0;
+
+  roomFormType:string = "";
 
   constructor()
   {
     this.dataSource = new MatTableDataSource();
   }
+
 
   ngOnInit()
   {
@@ -172,6 +186,14 @@ export class ManageRoomStatusComponent  implements OnInit
     {
       this.dataSource.data = rooms;
     });
+
+
+    this.roomFormType = this.route.snapshot.paramMap.get('roomFormType')!;
+    if(this.roomFormType === "block")
+    {
+      this.stayId = +this.route.snapshot.paramMap.get('stayId')!;
+    }
+
   }
   applyFilter(event: MatButtonToggleChange)
   {
@@ -186,9 +208,24 @@ export class ManageRoomStatusComponent  implements OnInit
     });
   }
 
+
+  assignStayToRoom(roomId:number)
+  {
+    const assignedRoom = this.dataSource.data.find(room => room.roomId === roomId)
+    if(assignedRoom)
+    {
+      console.log(this.stayService.currentStay);
+      assignedRoom.stay = this.stayService.currentStay;
+      assignedRoom.roomIsBlocked = true;
+      this.roomService.saveOneRoom(roomId, assignedRoom).subscribe();
+    }
+    this.router.navigate(['/new-stay', {stayId: this.stayId, formType: "checkIn"}]);
+  }
+
   updateRoomStatus(event: MatCheckboxChange,roomId:number )
   {
     const room = this.dataSource.data.find(room => room.roomId === roomId);
     room!.roomIsClean = event.checked;
   }
+
 }

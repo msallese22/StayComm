@@ -53,4 +53,9 @@ export class EmpHomeComponent implements OnInit{
   {
     this.router.navigate(['/master-table', {tableType: tableType}])
   }
+
+  routeToRoomTable()
+  {
+    this.router.navigate(['/room-status', {roomFormType: "change"}])
+  }
 }
