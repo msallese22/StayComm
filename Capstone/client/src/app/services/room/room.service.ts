@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Room} from '../../models/room-status';
+import {StayInfo} from '../../models/stay-info';
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +21,9 @@ export class RoomService {
     return this.http.put<Room[]>(`${this.url}/room/room-status-change`, updatedRooms);
   }
 
-  saveOneRoom(roomId: number, room:Room)
+  getRoomByStayId(stayId:number)
   {
-    console.log(room);
-    return this.http.put<Room>(`${this.url}/room/assign-a-room/${roomId}`, room);
-    //Nick problem might be here
+    return this.http.get<Room>(`${this.url}/room/get-room-by-stayid/${stayId}`);
   }
+
 }

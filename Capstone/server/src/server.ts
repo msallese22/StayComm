@@ -187,25 +187,25 @@ AppDataSource.initialize()//initializing where the database is to go!
             res.json(savedRoomList);
         });
         //Nick is put request right
-        app.put('/room/assign-a-room/:id', async (req, res ) =>
+        app.put('/room/assign-a-room', async (req, res ) =>
         {
-            const id = req.params.id;
             const roomData = req.body;
             const roomRepository = AppDataSource.getRepository(Room);
             const existingRoom = await roomRepository.findOneBy({
-                roomId: +id
+                roomId: roomData.id
             });
             if (!existingRoom)
             {
                 res.status(404).json({
-                    message: `Stay with id ${id} not found`
+                    message: `Room with id ${roomData.id} not found`
                 });
                 return;
             }
 
             roomRepository.merge(existingRoom, roomData);
+            //forcing the objects to merge!!
+            existingRoom.stay = roomData.stay;
             console.log(roomData);
-
             try
             {
                 const updatedRoom = await roomRepository.save(existingRoom);
@@ -219,6 +219,27 @@ AppDataSource.initialize()//initializing where the database is to go!
                 });
             }
         });
+
+        app.get('/room/get-room-by-stayid/:id', async (req, res) =>
+        {
+            const id = req.params.id;
+
+            const roomByStayId = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .innerJoinAndSelect("room.stay", "stay")
+                .where("room.stay.stayId = :id", {id: id})
+                .getOne();
+
+            if (!roomByStayId)
+            {
+                res.status(404).json({
+                    message: `Stay with ID ${id} not found.`
+                });
+            }
+            else
+            {
+                res.json(roomByStayId);
+            }
+        })
         app.post('/stay/save-new-stay/', async (req, res) =>
         {
             const stayData = req.body;

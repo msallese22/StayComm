@@ -38,7 +38,7 @@ class Stay
 
     //when you save a stay, update the room, too.
     //which side should the cascade go on
-    @OneToMany(() => Room, room => room.stays)
+    @OneToMany(() => Room, room => room.stay)
     @JoinColumn({name: 'STAY_ID'})
     room!: Room;
 

@@ -14,8 +14,10 @@
   </mat-button-toggle-group>
 
 
+ @if(roomFormType === "change")
+ {
   <button mat-button class="save-button" (click)="saveChanges()">Save Changes</button>
-
+ }
 </div>
 
 <div class="mat-elevation-z8">

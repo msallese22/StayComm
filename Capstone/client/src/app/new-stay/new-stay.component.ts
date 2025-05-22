@@ -24,9 +24,11 @@ import {GuestService} from '../services/guest/guest.service';
 import {StayInfo} from '../models/stay-info';
 import {Guest} from '../models/guest-interface';
 import {Rate} from '../models/rate';
+import {Room} from '../models/room-status'
 import {CurrencyPipe} from '@angular/common';
 import {AreYouSureModalComponent} from '../shared/are-you-sure-modal/are-you-sure-modal.component';
 import {CancelStayModalComponent} from '../shared/cancel-stay-modal/cancel-stay-modal.component';
+import {RoomService} from '../services/room/room.service';
 
 @Component({
   selector: 'app-new-stay',
@@ -57,6 +59,7 @@ export class NewStayComponent implements OnInit
   router = inject(Router);
   stayService = inject(StayService);
   guestService = inject(GuestService);
+  roomService = inject(RoomService);
   route = inject(ActivatedRoute);
   isNewStay: boolean = false;
   stay: StayInfo | null = null;
@@ -65,6 +68,8 @@ export class NewStayComponent implements OnInit
   totalCost: number = 0;
   buttonText: string = "";
   formType: string = "";
+  room: Room | null = null;
+  roomNumber: string = "";
 
 
   constructor()
@@ -165,6 +170,18 @@ export class NewStayComponent implements OnInit
           next: (data) =>
           {
 
+            this.roomService.getRoomByStayId(+stayId).subscribe(room =>
+              {
+                this.room = room
+                if (!this.room?.stay)
+                {
+                  this.roomNumber = "Assign A Room"
+                }
+                else
+                {
+                  this.roomNumber = `Room ${this.room!.roomId}`;
+                }
+              });
             this.stay = data;
             this.modifiedStay = {...data};
             //Nick sending it the whole stay object so it can sign to whole thing instead of just part of the thing
@@ -204,6 +221,8 @@ export class NewStayComponent implements OnInit
         {
           this.newStayForm.get("checkInDate")?.disable();
           this.buttonText = "Check In";
+          console.log(this.room?.stay);
+
         }
         else if (this.formType === "checkOut")
         {
@@ -311,7 +330,7 @@ export class NewStayComponent implements OnInit
 
   routeToRoomTable()
   {
-    this.router.navigate(['/room-status', {roomFormType: "block", stayId: this.stay!.stayId}]);
+    this.router.navigate(['/room-status', {roomFormType: "block", stayId: this.stay!.stayId, stayRoomType: this.stay!.roomType}]);
   }
 
   openDialog(): void

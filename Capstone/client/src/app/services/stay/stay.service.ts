@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {StayInfo} from '../../models/stay-info';
 import {Rate} from '../../models/rate';
+import {Room} from '../../models/room-status';
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +64,13 @@ export class StayService {
 
   updateStay(stay: StayInfo): Observable<StayInfo>{
     return this.http.put<StayInfo>(`${this.url}/stay/${stay.stayId}`, stay);
+  }
+
+  saveOneRoom( room:Room )
+  {
+    console.log(room);
+    return this.http.put<Room>(`${this.url}/room/assign-a-room`, room);
+    //Nick problem might be here
   }
 
 }

@@ -111,7 +111,7 @@
           <p></p>
         }
         @if (formType === "checkIn") {
-          <button mat-raised-button class="assign-room" (click)="routeToRoomTable()">Assign a Room</button>
+          <button mat-raised-button class="assign-room" (click)="routeToRoomTable()">{{ this.roomNumber }}</button>
         }
         <mat-icon class="info"
                   matTooltip="Our King Suite will have a single King size bed and a sofa bed. Our Queen Suite has two Queen size beds and a sofa bed.">

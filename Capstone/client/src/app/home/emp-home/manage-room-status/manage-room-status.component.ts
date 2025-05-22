@@ -20,6 +20,7 @@ import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
 import {MatButton} from '@angular/material/button';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
+import {filter} from 'rxjs';
 
 @Component({
   selector: 'app-manage-room-status',
@@ -85,6 +86,7 @@ export class ManageRoomStatusComponent  implements OnInit
 
   ngOnInit()
   {
+
     this.dataSource.filterPredicate = (data: Room, filter: string) =>
     {
       if(filter==='clean')
@@ -191,13 +193,36 @@ export class ManageRoomStatusComponent  implements OnInit
     this.roomFormType = this.route.snapshot.paramMap.get('roomFormType')!;
     if(this.roomFormType === "block")
     {
+      const filteredRoomType = this.route.snapshot.paramMap.get("stayRoomType");
+
+      if(filteredRoomType === 'K')
+      {
+        this.typeFilter.setValue("king")
+      }
+      else
+      {
+        this.typeFilter.setValue("queen")
+      }
       this.stayId = +this.route.snapshot.paramMap.get('stayId')!;
+      this.cleanFilter.setValue("clean");
+      this.applyFilter(undefined, this.typeFilter.value!);
+      this.applyFilter(undefined, this.cleanFilter.value!)
+
     }
 
   }
-  applyFilter(event: MatButtonToggleChange)
+  applyFilter(event?: MatButtonToggleChange, filtersSomething?: string)
   {
-    this.dataSource.filter = event.value;
+    this.dataSource.filter = event?.value;
+
+    if(event)
+    {
+      this.dataSource.filter = event.value;
+    }
+    else
+    {
+      this.dataSource.filter = filtersSomething!;
+    }
   }
 
   saveChanges()
@@ -209,15 +234,15 @@ export class ManageRoomStatusComponent  implements OnInit
   }
 
 
-  assignStayToRoom(roomId:number)
+  assignStayToRoom(stayId:number)
   {
-    const assignedRoom = this.dataSource.data.find(room => room.roomId === roomId)
+    const assignedRoom = this.dataSource.data.find(room => room.roomId === stayId)
     if(assignedRoom)
     {
       console.log(this.stayService.currentStay);
       assignedRoom.stay = this.stayService.currentStay;
       assignedRoom.roomIsBlocked = true;
-      this.roomService.saveOneRoom(roomId, assignedRoom).subscribe();
+      this.stayService.saveOneRoom(assignedRoom).subscribe();
     }
     this.router.navigate(['/new-stay', {stayId: this.stayId, formType: "checkIn"}]);
   }

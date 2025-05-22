@@ -26,5 +26,5 @@ class Room
     //problem might be here, Nick?
     @ManyToOne(() => Stay, stay => stay.room, {cascade:["update"]})
     @JoinColumn({name: 'STAY_ID'})
-    stays!: Stay;
+    stay!: Stay;
 }
