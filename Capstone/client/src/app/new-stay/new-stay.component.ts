@@ -69,7 +69,7 @@ export class NewStayComponent implements OnInit
   buttonText: string = "";
   formType: string = "";
   room: Room | null = null;
-  roomNumber: string = "";
+  roomNumber: string | undefined;
 
 
   constructor()
@@ -170,8 +170,15 @@ export class NewStayComponent implements OnInit
           next: (data) =>
           {
 
-            this.roomService.getRoomByStayId(+stayId).subscribe(room =>
+            if(this.roomService.currentRoom)
+            {
+              this.roomNumber = `Room ${this.roomService.currentRoom.roomId}`;
+            }
+            else
+            {
+              this.roomService.getRoomByStayId(+stayId).subscribe(room =>
               {
+                console.log(room);
                 this.room = room
                 if (!this.room?.stay)
                 {
@@ -181,10 +188,11 @@ export class NewStayComponent implements OnInit
                 {
                   this.roomNumber = `Room ${this.room!.roomId}`;
                 }
+                console.log(this.roomNumber);
               });
+            }
             this.stay = data;
             this.modifiedStay = {...data};
-            //Nick sending it the whole stay object so it can sign to whole thing instead of just part of the thing
             this.stayService.currentStay = this.stay;
             let formattedCreditCardExp;
             const creditCardExpDate = new Date(this.modifiedStay.guest.creditCards[0].creditCardExp);
@@ -251,7 +259,6 @@ export class NewStayComponent implements OnInit
     if (this.newStayForm.get("checkInDate"))
     {
       console.log(this.newStayForm);
-      //getting the checkindate, making sure that's real and valid and not null.
       const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date();
 
 
@@ -361,7 +368,7 @@ export class NewStayComponent implements OnInit
             }]
         },
       stayIsCanceled: formValue.stayIsCanceled ? formValue.stayIsCanceled : false,
-      stayIsCheckedIn: false
+      stayIsCheckedIn: null
 
     };
     if (this.isNewStay)

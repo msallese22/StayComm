@@ -20,7 +20,7 @@ class Stay
     stayCheckoutDate!: Date;
 
     @Column({name: 'STAY_IS_CHECKED_IN', type: 'boolean'})
-    stayIsCheckedIn!: boolean;
+    stayIsCheckedIn?: boolean;
 
     @Column({name: 'ROOM_TYPE', type: 'char'})
     roomType!: string;

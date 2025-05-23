@@ -21,6 +21,7 @@ import {MatButton} from '@angular/material/button';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {filter} from 'rxjs';
+import {NewStayComponent} from '../../../new-stay/new-stay.component';
 
 @Component({
   selector: 'app-manage-room-status',
@@ -210,6 +211,8 @@ export class ManageRoomStatusComponent  implements OnInit
 
     }
 
+
+
   }
   applyFilter(event?: MatButtonToggleChange, filtersSomething?: string)
   {
@@ -223,6 +226,8 @@ export class ManageRoomStatusComponent  implements OnInit
     {
       this.dataSource.filter = filtersSomething!;
     }
+
+
   }
 
   saveChanges()
@@ -240,6 +245,7 @@ export class ManageRoomStatusComponent  implements OnInit
     if(assignedRoom)
     {
       console.log(this.stayService.currentStay);
+      this.roomService.currentRoom = assignedRoom;
       assignedRoom.stay = this.stayService.currentStay;
       assignedRoom.roomIsBlocked = true;
       this.stayService.saveOneRoom(assignedRoom).subscribe();

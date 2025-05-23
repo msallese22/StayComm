@@ -6,6 +6,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {StayInfo} from '../../../models/stay-info';
 import {StayService} from '../../../services/stay/stay.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {RoomService} from '../../../services/room/room.service';
 
 @Component({
   selector: 'app-arrive-table',
@@ -19,6 +20,8 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
   displayedColumns: string[] = ['guestLname', 'stayId', 'roomId', 'stayCheckinDate', 'stayCheckoutDate'];
   dataSource: MatTableDataSource<StayInfo>;
   tableType: string = "";
+  roomNumber: string | undefined;
+
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -48,7 +51,6 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
       this.stayService.getArrivalInfo().subscribe(arrivers =>
       {
         this.dataSource.data = arrivers;
-
       });
     }
     else if (this.tableType === "departers")
@@ -66,7 +68,6 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
         this.dataSource.data = inHouseGuests;
       });
     }
-
 
 
   }

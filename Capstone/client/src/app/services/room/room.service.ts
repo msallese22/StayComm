@@ -8,6 +8,7 @@ import {StayInfo} from '../../models/stay-info';
 })
 export class RoomService {
 
+  currentRoom!:Room;
   private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 

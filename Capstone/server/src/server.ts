@@ -38,6 +38,7 @@ AppDataSource.initialize()//initializing where the database is to go!
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckoutDate = :today", {today: dateObject})
                 .andWhere("stay.stayIsCanceled = false")
+                .andWhere("stay.stayIsCheckedIn = true")
                 .getCount();
             if (!departureCount)
             {
@@ -57,7 +58,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             const arrivalCount = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
-                .andWhere("stay.stayIsCheckedIn = false")
+                .andWhere("stay.stayIsCheckedIn IS NULL")
                 .andWhere("stay.stayIsCanceled = false")
                 .getCount();
             if (!arrivalCount)
@@ -78,6 +79,7 @@ AppDataSource.initialize()//initializing where the database is to go!
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
                 .andWhere("stay.stayIsCanceled = false")
+                .andWhere("stay.stayIsCheckedIn IS NULL")
                 .getMany();
             if (!arrivingArrivals)
             {
@@ -97,6 +99,7 @@ AppDataSource.initialize()//initializing where the database is to go!
                 .innerJoinAndSelect("stay.guest", "guest")
                 .where("stay.stayCheckoutDate = :today", {today: dateObject})
                 .andWhere("stay.stayIsCanceled = false")
+                .andWhere("stay.stayIsCheckedIn = true")
                 .getMany();
             if (!departingDepartures)
             {
