@@ -34,7 +34,7 @@
     <ng-container matColumnDef="roomId">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Room Number</th>
       <td mat-cell *matCellDef="let row">
-        {{ row.roomNumber }}
+        {{ row.room.length > 0 ? row.room[0].roomId : "" }}
       </td>
     </ng-container>
 

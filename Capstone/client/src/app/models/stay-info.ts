@@ -1,4 +1,5 @@
 import {Guest} from './guest-interface';
+import {Room} from './room-status';
 
 export interface StayInfo{
   stayId: number;
@@ -8,5 +9,6 @@ export interface StayInfo{
   stayIsCanceled: boolean;
   stayIsCheckedIn?: boolean | null;
   //propertyId: number;
-  guest: Guest
+  guest: Guest;
+  room?: Room[];
 }

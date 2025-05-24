@@ -20,7 +20,7 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
   displayedColumns: string[] = ['guestLname', 'stayId', 'roomId', 'stayCheckinDate', 'stayCheckoutDate'];
   dataSource: MatTableDataSource<StayInfo>;
   tableType: string = "";
-  roomNumber: string | undefined;
+  roomNumber: number | undefined;
 
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -80,7 +80,6 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
 
   navigate(stayId:number)
   {
-
       if(this.tableType === "arrivers")
       {
         this.router.navigate(['/new-stay', {stayId: stayId, formType: "checkIn"}]);

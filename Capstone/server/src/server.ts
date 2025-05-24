@@ -77,6 +77,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const arrivingArrivals = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
+                .leftJoinAndSelect("stay.room", "room")
                 .where("stay.stayCheckinDate = :today", {today: dateObject})
                 .andWhere("stay.stayIsCanceled = false")
                 .andWhere("stay.stayIsCheckedIn IS NULL")
@@ -97,6 +98,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const departingDepartures = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
+                .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayCheckoutDate = :today", {today: dateObject})
                 .andWhere("stay.stayIsCanceled = false")
                 .andWhere("stay.stayIsCheckedIn = true")
@@ -136,6 +138,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const checkedInGuests = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
+                .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayIsCheckedIn = true")
                 .getMany();
             if (!checkedInGuests)
@@ -407,6 +410,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             const stayById = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
                 .innerJoinAndSelect("guest.creditCards", "creditCard")
+                .leftJoinAndSelect("stay.room", "room")
                 .where("stay.stayId = :id", {id: id})
                 .getOne();
 

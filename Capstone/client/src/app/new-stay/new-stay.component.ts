@@ -127,7 +127,16 @@ export class NewStayComponent implements OnInit
 
   get newStayFormInvalid()
   {
-    return this.newStayForm.invalid;
+    console.log(this.buttonText);
+    //return (this.formType === "checkIn" && this.modifiedStay.room?.length === 0) || this.newStayForm.invalid;
+    if(this.formType === 'checkIn')
+    {
+      return this.roomNumber === "Assign a Room";
+    }
+    else
+    {
+      return this.newStayForm.invalid;
+    }
   }
 
 
@@ -221,6 +230,7 @@ export class NewStayComponent implements OnInit
             this.newStayForm.get("stayIsCanceled")?.setValue(this.modifiedStay.stayIsCanceled);
 
             this.newStayForm.updateValueAndValidity();
+            this.pickMyDates();
           }
         });
         this.buttonText = "Save Changes";
@@ -252,19 +262,26 @@ export class NewStayComponent implements OnInit
     }
   }
 
-  pickMyDates(event: MatDatepickerInputEvent<Date>)
+  pickMyDates(event?: MatDatepickerInputEvent<Date>)
   {
     this.totalCost = 0;
     this.ratesArray = [];
     if (this.newStayForm.get("checkInDate"))
     {
-      console.log(this.newStayForm);
+      console.log("rates here");
       const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date();
+      const checkOutDateExists = event ? new Date(event.value!) : new Date(this.newStayForm.get("checkOutDate")!.value!);
+
+      console.log(this.newStayForm.get("checkInDate")?.valid);
+      console.log(this.newStayForm.get("checkOutDate")?.valid);
 
 
-      if (this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
+      if ((this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
+        || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.valid)
       {
-        this.stayService.postRateList(checkInDateExists!, event.value!).subscribe(rates =>
+        console.log("getting into datepicker");
+
+        this.stayService.postRateList(checkInDateExists!, checkOutDateExists!).subscribe(rates =>
         {
           console.log(rates);
           this.ratesArray = rates;
@@ -403,6 +420,15 @@ export class NewStayComponent implements OnInit
         if (this.formType === 'checkIn')
         {
           this.modifiedStay.stayIsCheckedIn = true;
+        }
+        else if(this.formType === 'checkOut')
+        {
+          this.modifiedStay.stayIsCheckedIn = false;
+          if(this.modifiedStay.room && this.modifiedStay.room.length > 0)
+          {
+            this.modifiedStay.room[0].roomIsBlocked = false;
+            this.modifiedStay.room[0].roomIsClean = false;
+          }
         }
 
         this.stayService.updateStay(this.modifiedStay).subscribe(data =>
