@@ -420,6 +420,10 @@ export class NewStayComponent implements OnInit
         if (this.formType === 'checkIn')
         {
           this.modifiedStay.stayIsCheckedIn = true;
+          if(this.roomService.currentRoom)
+          {
+            this.modifiedStay.room = [this.roomService.currentRoom];
+          }
         }
         else if(this.formType === 'checkOut')
         {

@@ -29,7 +29,6 @@ AppDataSource.initialize()//initializing where the database is to go!
     {
         const d = new Date();
         const dateObject = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        //it's a dateObject because working with the dates directly? it hated it.
 
         console.log("Data source has been initialized!");
         app.get('/stay/departures', async (req, res) =>
@@ -120,6 +119,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const inHouseCount = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .where("stay.stayIsCheckedIn = true")
+                .andWhere("stay.stayIsCanceled = false")
                 .getCount();
             if (!inHouseCount)
             {
@@ -140,6 +140,7 @@ AppDataSource.initialize()//initializing where the database is to go!
                 .innerJoinAndSelect("stay.guest", "guest")
                 .innerJoinAndSelect("stay.room", "room")
                 .where("stay.stayIsCheckedIn = true")
+                .andWhere("stay.stayIsCanceled = false")
                 .getMany();
             if (!checkedInGuests)
             {
@@ -457,7 +458,57 @@ AppDataSource.initialize()//initializing where the database is to go!
                 });
             }
         });
+
+        app.get('/get-availability', async (req, res) => {
+            const availableRooms = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .innerJoinAndSelect("room.stay", "stay")
+                .where("stay.stayCheckinDate <= :checkinDate OR stay.stayCheckoutDate >= :checkoutDate", {
+                    checkinDate: dateObject,
+                    checkoutDate: dateObject
+                })
+                .andWhere("stay.stayIsCanceled = false")
+                .getCount();
+            const availableKings = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .innerJoinAndSelect("room.stay", "stay")
+                .where("stay.stayCheckinDate >= :checkinDate OR stay.stayCheckoutDate <= :checkoutDate", {
+                    checkinDate: dateObject,
+                    checkoutDate: dateObject
+                })
+                .andWhere("stay.stayIsCanceled = false")
+                .andWhere("room.roomType = 'K'")
+                .getCount();
+            const availableQueens = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .innerJoinAndSelect("room.stay", "stay")
+                .where("stay.stayCheckinDate >= :checkinDate AND stay.stayCheckoutDate <= :checkoutDate", {
+                    checkinDate: dateObject,
+                    checkoutDate: dateObject
+                })
+                .andWhere("stay.stayIsCanceled = false")
+                .andWhere("room.roomType = 'Q'")
+                .getCount();
+            if (!availableRooms)
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `Room availability not found :( Valtor booked them all`
+                });
+            }
+            else
+            {
+                const allAvailableRooms = {
+                    totalAvailability: availableRooms,
+                    totalAvailableKings: availableKings,
+                    totalAvailableQueens: availableQueens
+                }
+                res.json(allAvailableRooms);//send the product as a json response.
+            }
+        })
+
+
     });
+
+
+
 
 
 function getDatesInRange(checkinDate: Date, checkoutDate: Date)
