@@ -23,9 +23,12 @@ export const routes: Routes = [
     path: "room-status", component: ManageRoomStatusComponent
   },
   {
-    path:"", component: HomeComponent
+    path: "login", component: LoginComponent
   },
   {
-    path: "*", component: HomeComponent
+    path:"", component: LoginComponent
+  },
+  {
+    path: "*", component: LoginComponent
   }
 ];

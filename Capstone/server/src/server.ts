@@ -194,7 +194,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             res.json(savedRoomList);
         });
         //Nick is put request right
-        app.put('/room/assign-a-room', async (req, res ) =>
+        app.put('/room/assign-a-room', async (req, res) =>
         {
             const roomData = req.body;
             const roomRepository = AppDataSource.getRepository(Room);
@@ -246,7 +246,7 @@ AppDataSource.initialize()//initializing where the database is to go!
             {
                 res.json(roomByStayId);
             }
-        })
+        });
         app.post('/stay/save-new-stay/', async (req, res) =>
         {
             const stayData = req.body;
@@ -459,7 +459,8 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
         });
 
-        app.get('/get-availability', async (req, res) => {
+        app.get('/get-availability', async (req, res) =>
+        {
             const availableRooms = await AppDataSource.getRepository(Room).createQueryBuilder("room")
                 .innerJoinAndSelect("room.stay", "stay")
                 .where("stay.stayCheckinDate <= :checkinDate OR stay.stayCheckoutDate >= :checkoutDate", {
@@ -499,16 +500,63 @@ AppDataSource.initialize()//initializing where the database is to go!
                     totalAvailability: availableRooms,
                     totalAvailableKings: availableKings,
                     totalAvailableQueens: availableQueens
-                }
+                };
                 res.json(allAvailableRooms);//send the product as a json response.
             }
-        })
+        });
 
+        app.post('/login', async (req, res) =>
+        {
+            const email = req.body.email;
+            const password = req.body.password;
 
+            const employee = await AppDataSource.getRepository(Employee).createQueryBuilder("employee")
+                .where("employee.employeeEmail = :email", {
+                    email: email
+                })
+                .getOne();
+            if (employee)
+            {
+                if (employee.employeePassword === password)
+                {
+                    res.json(employee);
+                }
+                else
+                {
+                    res.status(404).json({
+                        message: `Incorrect employee login.`
+                    });
+                }
+            }
+            else
+            {
+                const guest = await AppDataSource.getRepository(Guest).createQueryBuilder("guest")
+                    .where("guest.guestEmail = :email", {
+                        email: email
+                    })
+                    .getOne();
+                if (guest)
+                {
+                    if (guest.guestPassword === password)
+                    {
+                        res.json(guest);
+                    }
+                    else
+                    {
+                        res.status(404).json({
+                            message: `Incorrect guest login.`
+                        });
+                    }
+                }
+                else
+                {
+                    res.status(404).json({
+                        message: 'Not a registered user.'
+                    });
+                }
+            }
+        });
     });
-
-
-
 
 
 function getDatesInRange(checkinDate: Date, checkoutDate: Date)

@@ -1,1 +1,35 @@
-<p>login works!</p>
+<div class="container">
+  <div class="black-box">
+    <img class="logo" ngSrc="/logo.png" width="75" height="75" alt="staycomm logo" priority>
+    <div class="welcome">Welcome!</div>
+    <div class="nice-message">Please login</div>
+    <form [formGroup]="loginForm" class="form">
+    <mat-form-field>
+      <input matInput placeholder="email" formControlName="email">
+      @if(loginForm.get("email")?.hasError("required"))
+      {
+        <mat-error>Email address is required</mat-error>
+      }
+      @if(loginForm.get("email")?.hasError("email"))
+      {
+        <mat-error>Invalid Email</mat-error>
+      }
+    </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="password" formControlName="password">
+        @if(loginForm.get("password")?.hasError("required"))
+        {
+          <mat-error>Password is required</mat-error>
+        }
+        @if(loginForm.get("email")?.hasError("password"))
+        {
+          <mat-error>Invalid Password</mat-error>
+        }
+    </mat-form-field>
+    </form>
+    <div>{{errorText}}</div>
+    <button mat-raised-button class="login-button" [disabled]="loginForm.invalid" (click)="clickLoginButton()">
+      Login
+    </button>
+  </div>
+</div>
