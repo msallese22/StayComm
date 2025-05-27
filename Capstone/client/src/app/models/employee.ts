@@ -6,4 +6,5 @@ export class Employee{
   employeeEmail!: string;
   employeePhone!: number;
   employeePassword!: string;
+  propertyId!: number;
 }

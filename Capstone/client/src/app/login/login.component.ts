@@ -7,6 +7,7 @@ import {LoginService} from '../services/login/login.service';
 import {LoginInfo} from '../models/login-info';
 import {Router} from '@angular/router';
 import {Employee} from '../models/employee';
+import {Guest} from '../models/guest-interface';
 
 @Component({
   selector: 'app-login',
@@ -42,17 +43,23 @@ export class LoginComponent {
     }
     this.login.postLogin(loginInfo).subscribe({
       next: (user) => {
+        console.log(user instanceof Employee);
+        console.log(user instanceof Guest);
         if(user instanceof Employee)
         {
-          this.router.navigate(["/home"])
+          console.log("do not hit this.");
+          this.login.nextValueForIsEmployee(true);
+          this.login.employee = user;
+          this.router.navigate(["/home", {employee: true}])
         }
         else
         {
-          this.router.navigate(["/home"])
+          this.login.nextValueForIsEmployee(false);
+          this.login.guest = user;
+          this.router.navigate(["/home", {employee: false}])
         }
       },
       error: (error) => {
-        console.log(error);
         this.errorText = error.error.message;
       }
     })

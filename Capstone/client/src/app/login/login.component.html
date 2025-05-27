@@ -16,7 +16,7 @@
       }
     </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="password" formControlName="password">
+        <input matInput type="password" placeholder="password" formControlName="password">
         @if(loginForm.get("password")?.hasError("required"))
         {
           <mat-error>Password is required</mat-error>

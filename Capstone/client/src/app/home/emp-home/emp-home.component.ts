@@ -4,6 +4,8 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {StayService} from '../../services/stay/stay.service';
+import {LoginService} from '../../services/login/login.service';
+import {Employee} from '../../models/employee';
 
 @Component({
   selector: 'app-emp-home',
@@ -29,6 +31,8 @@ export class EmpHomeComponent implements OnInit{
 
   private stayService = inject(StayService)
   private router = inject(Router);
+  private loginService = inject(LoginService);
+  user!:Employee;
   ngOnInit()
   {
     this.stayService.getDepartureCount().subscribe(count => {
@@ -42,6 +46,8 @@ export class EmpHomeComponent implements OnInit{
     this.stayService.getCheckedInCount().subscribe(count => {
       this.checkedInCount = count;
     })
+
+    this.user = this.loginService.employee;
   }
 
   newStay()
