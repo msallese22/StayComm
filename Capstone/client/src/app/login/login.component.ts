@@ -43,19 +43,17 @@ export class LoginComponent {
     }
     this.login.postLogin(loginInfo).subscribe({
       next: (user) => {
-        console.log(user instanceof Employee);
-        console.log(user instanceof Guest);
-        if(user instanceof Employee)
+        if(user.isEmployee)
         {
           console.log("do not hit this.");
           this.login.nextValueForIsEmployee(true);
-          this.login.employee = user;
+          this.login.employee = user.user as Employee;
           this.router.navigate(["/home", {employee: true}])
         }
         else
         {
           this.login.nextValueForIsEmployee(false);
-          this.login.guest = user;
+          this.login.guest = user.user as Guest;
           this.router.navigate(["/home", {employee: false}])
         }
       },

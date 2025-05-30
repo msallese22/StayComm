@@ -4,6 +4,7 @@ import {Employee} from '../../models/employee';
 import {Guest} from '../../models/guest-interface';
 import {LoginInfo} from '../../models/login-info';
 import {BehaviorSubject} from 'rxjs';
+import {User} from '../../models/user-info';
 
 
 @Injectable({
@@ -25,7 +26,7 @@ export class LoginService {
 
   postLogin(loginInfo: LoginInfo)
   {
-    return this.http.post<Employee | Guest>(`${this.url}/login`, loginInfo);
+    return this.http.post<User>(`${this.url}/login`, loginInfo);
   }
 
   nextValueForIsEmployee(value:boolean)

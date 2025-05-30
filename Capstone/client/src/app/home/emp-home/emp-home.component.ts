@@ -6,6 +6,8 @@ import {MatIcon} from '@angular/material/icon';
 import {StayService} from '../../services/stay/stay.service';
 import {LoginService} from '../../services/login/login.service';
 import {Employee} from '../../models/employee';
+import {RoomService} from '../../services/room/room.service';
+import {Availability} from '../../models/availability';
 
 @Component({
   selector: 'app-emp-home',
@@ -28,8 +30,12 @@ export class EmpHomeComponent implements OnInit{
   departureCount = 0;
   arrivalCount = 0;
   checkedInCount = 0;
+  availableRoomCount = 0;
+
+  availability!:Availability;
 
   private stayService = inject(StayService)
+  private roomService = inject(RoomService)
   private router = inject(Router);
   private loginService = inject(LoginService);
   user!:Employee;
@@ -48,6 +54,11 @@ export class EmpHomeComponent implements OnInit{
     })
 
     this.user = this.loginService.employee;
+
+    this.roomService.getRoomAvailability().subscribe(count => {
+      this.availableRoomCount = count.totalAvailability;
+      this.availability = count;
+    })
   }
 
   newStay()

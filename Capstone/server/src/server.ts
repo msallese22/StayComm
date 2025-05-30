@@ -8,7 +8,7 @@ import {CreditCard} from "./entities/credit-card";
 import {Guest} from "./entities/guest";
 import {Employee} from "./entities/employee";
 import {Property} from "./entities/property";
-import {Repository} from "typeorm";
+import {Brackets, Repository} from "typeorm";
 import {RatePrice} from "./entities/rate-price";
 import {json} from "node:stream/consumers";
 
@@ -462,29 +462,28 @@ AppDataSource.initialize()//initializing where the database is to go!
         app.get('/get-availability', async (req, res) =>
         {
             const availableRooms = await AppDataSource.getRepository(Room).createQueryBuilder("room")
-                .innerJoinAndSelect("room.stay", "stay")
-                .where("stay.stayCheckinDate <= :checkinDate OR stay.stayCheckoutDate >= :checkoutDate", {
+                .leftJoinAndSelect("room.stay", "stay")
+                .where("stay.stayCheckinDate >= :checkinDate OR stay.stayCheckoutDate <= :checkoutDate OR room.stay IS NULL", {
                     checkinDate: dateObject,
                     checkoutDate: dateObject
                 })
-                .andWhere("stay.stayIsCanceled = false")
                 .getCount();
             const availableKings = await AppDataSource.getRepository(Room).createQueryBuilder("room")
-                .innerJoinAndSelect("room.stay", "stay")
-                .where("stay.stayCheckinDate >= :checkinDate OR stay.stayCheckoutDate <= :checkoutDate", {
-                    checkinDate: dateObject,
-                    checkoutDate: dateObject
-                })
-                .andWhere("stay.stayIsCanceled = false")
+                .leftJoinAndSelect("room.stay", "stay")
+                .where(new Brackets(qb => {
+                    qb.where("stay.stayCheckinDate >= :checkinDate", {checkinDate: dateObject})
+                        .orWhere("stay.stayCheckoutDate <= :checkoutDate", {checkoutDate: dateObject})
+                        .orWhere("room.stay IS NULL")
+                }))
                 .andWhere("room.roomType = 'K'")
                 .getCount();
             const availableQueens = await AppDataSource.getRepository(Room).createQueryBuilder("room")
-                .innerJoinAndSelect("room.stay", "stay")
-                .where("stay.stayCheckinDate >= :checkinDate AND stay.stayCheckoutDate <= :checkoutDate", {
-                    checkinDate: dateObject,
-                    checkoutDate: dateObject
-                })
-                .andWhere("stay.stayIsCanceled = false")
+                .leftJoinAndSelect("room.stay", "stay")
+                .where(new Brackets(qb => {
+                    qb.where("stay.stayCheckinDate >= :checkinDate", {checkinDate: dateObject})
+                        .orWhere("stay.stayCheckoutDate <= :checkoutDate", {checkoutDate: dateObject})
+                        .orWhere("room.stay IS NULL")
+                }))
                 .andWhere("room.roomType = 'Q'")
                 .getCount();
             if (!availableRooms)
@@ -509,6 +508,7 @@ AppDataSource.initialize()//initializing where the database is to go!
         {
             const email = req.body.email;
             const password = req.body.password;
+            let isEmployee = false;
 
             const employee = await AppDataSource.getRepository(Employee).createQueryBuilder("employee")
                 .where("employee.employeeEmail = :email", {
@@ -519,7 +519,8 @@ AppDataSource.initialize()//initializing where the database is to go!
             {
                 if (employee.employeePassword === password)
                 {
-                    res.json(employee);
+                    isEmployee = true;
+                    res.json({user: employee, isEmployee: isEmployee});
                 }
                 else
                 {
@@ -539,7 +540,8 @@ AppDataSource.initialize()//initializing where the database is to go!
                 {
                     if (guest.guestPassword === password)
                     {
-                        res.json(guest);
+                        isEmployee = false;
+                        res.json({user: guest, isEmployee: isEmployee});
                     }
                     else
                     {

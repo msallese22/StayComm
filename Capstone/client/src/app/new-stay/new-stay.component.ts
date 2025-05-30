@@ -29,6 +29,7 @@ import {CurrencyPipe} from '@angular/common';
 import {AreYouSureModalComponent} from '../shared/are-you-sure-modal/are-you-sure-modal.component';
 import {CancelStayModalComponent} from '../shared/cancel-stay-modal/cancel-stay-modal.component';
 import {RoomService} from '../services/room/room.service';
+import {LoginService} from '../services/login/login.service';
 
 @Component({
   selector: 'app-new-stay',
@@ -60,6 +61,7 @@ export class NewStayComponent implements OnInit
   stayService = inject(StayService);
   guestService = inject(GuestService);
   roomService = inject(RoomService);
+  loginService = inject(LoginService);
   route = inject(ActivatedRoute);
   isNewStay: boolean = false;
   stay: StayInfo | null = null;
@@ -73,8 +75,7 @@ export class NewStayComponent implements OnInit
 
 
   constructor()
-  {
-  }
+  {}
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -102,7 +103,6 @@ export class NewStayComponent implements OnInit
       guestLastName: new FormControl('', [Validators.required]),
       guestPhone: new FormControl('', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]),
       guestEmail: new FormControl('', [Validators.required]),
-      guestNotes: new FormControl('')
     }),
     roomType: new FormControl('', [Validators.required]),
     creditCardInfoForm: new FormGroup({
@@ -128,7 +128,6 @@ export class NewStayComponent implements OnInit
   get newStayFormInvalid()
   {
     console.log(this.buttonText);
-    //return (this.formType === "checkIn" && this.modifiedStay.room?.length === 0) || this.newStayForm.invalid;
     if(this.formType === 'checkIn')
     {
       return this.roomNumber === "Assign a Room";
@@ -155,6 +154,7 @@ export class NewStayComponent implements OnInit
 
 //preloading it with data from the database--- all baby get requests
     //can we make it so if the email address or phone number matches an entry in the database, it populates the other stuff??
+    //gotta get this out, Valtor can't be the only one allowed to make stays forever!
     this.guestService.getGuestById(100).subscribe(data =>
     {
       this.guest = data;
@@ -405,7 +405,7 @@ export class NewStayComponent implements OnInit
         });
         dialogRef.afterClosed().subscribe(() =>
         {
-          this.router.navigateByUrl("/home");
+          this.router.navigate(['/home', {employee: this.loginService.employee !== undefined}]);
         });
       });
     }
@@ -413,7 +413,7 @@ export class NewStayComponent implements OnInit
     {
       if (this.formType === 'inHouseGuests')
       {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/home', {employee: this.loginService.employee !== undefined}]);
       }
       else
       {
@@ -450,7 +450,7 @@ export class NewStayComponent implements OnInit
           });
           dialogRef.afterClosed().subscribe(() =>
           {
-            this.router.navigateByUrl("/home");
+            this.router.navigate(['/home', {employee: this.loginService.employee !== undefined}]);
           });
         });
       }
