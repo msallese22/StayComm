@@ -14,13 +14,13 @@ class CreditCard
     @Column({name: 'CREDIT_CARD_NUM', type: 'int', unsigned: true })
     creditCardNum!: number;
 
-    @Column({name: 'CREDIT_CARD_EXP_DATE', type: 'date'})
-    creditCardExp!: Date;
+    @Column({name: 'CREDIT_CARD_EXP_DATE', type: 'char'})
+    creditCardExp!: string;
 
     @Column({name: 'CREDIT_CARD_CVV', type: 'int', unsigned: true})
     creditCardCvv!: number;
 
-    @ManyToOne(() => Guest, guest => guest.creditCards)
+    @ManyToOne(() => Guest, guest => guest.creditCards, {cascade:["update", "insert"]})
     @JoinColumn({name: 'GUEST_ID'})
     guest!: Guest;
 }

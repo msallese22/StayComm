@@ -212,7 +212,6 @@ export class ManageRoomStatusComponent  implements OnInit
     }
 
 
-
   }
   applyFilter(event?: MatButtonToggleChange, filtersSomething?: string)
   {
@@ -244,7 +243,6 @@ export class ManageRoomStatusComponent  implements OnInit
     const assignedRoom = this.dataSource.data.find(room => room.roomId === stayId)
     if(assignedRoom)
     {
-      console.log(this.stayService.currentStay);
       this.roomService.currentRoom = assignedRoom;
       assignedRoom.stay = this.stayService.currentStay;
       assignedRoom.roomIsBlocked = true;

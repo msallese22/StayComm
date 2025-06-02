@@ -8,6 +8,8 @@ import {LoginService} from '../../services/login/login.service';
 import {Employee} from '../../models/employee';
 import {RoomService} from '../../services/room/room.service';
 import {Availability} from '../../models/availability';
+import {MatTooltip} from '@angular/material/tooltip';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-emp-home',
@@ -20,6 +22,8 @@ import {Availability} from '../../models/availability';
     MatInput,
     MatIcon,
     MatIconButton,
+    MatTooltip,
+    ReactiveFormsModule
   ],
   templateUrl: './emp-home.component.html',
   standalone: true,
@@ -32,6 +36,8 @@ export class EmpHomeComponent implements OnInit{
   checkedInCount = 0;
   availableRoomCount = 0;
 
+  availableRoomsMessage = "";
+
   availability!:Availability;
 
   private stayService = inject(StayService)
@@ -39,6 +45,8 @@ export class EmpHomeComponent implements OnInit{
   private router = inject(Router);
   private loginService = inject(LoginService);
   user!:Employee;
+
+  search = new FormControl("");
   ngOnInit()
   {
     this.stayService.getDepartureCount().subscribe(count => {
@@ -58,6 +66,8 @@ export class EmpHomeComponent implements OnInit{
     this.roomService.getRoomAvailability().subscribe(count => {
       this.availableRoomCount = count.totalAvailability;
       this.availability = count;
+
+      this.availableRoomsMessage = `Available Queens: ${this.availability.totalAvailableQueens} \n Available Kings: ${this.availability.totalAvailableKings}`;
     })
   }
 
@@ -74,5 +84,11 @@ export class EmpHomeComponent implements OnInit{
   routeToRoomTable()
   {
     this.router.navigate(['/room-status', {roomFormType: "change"}])
+  }
+
+
+  searchButton()
+  {
+    this.router.navigate(["/master-table", {searchValue: this.search.value, tableType: "searchResults"}])
   }
 }

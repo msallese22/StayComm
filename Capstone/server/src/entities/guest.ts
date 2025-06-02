@@ -30,7 +30,7 @@ class Guest
     @OneToMany(() => Stay, stay => stay.guest)
     stays!: Stay;
 
-    @OneToMany(() => CreditCard, creditCard => creditCard.guest)
+    @OneToMany(() => CreditCard, creditCard => creditCard.guest, {cascade:["update", "insert"]})
     creditCards!: CreditCard
 
 }

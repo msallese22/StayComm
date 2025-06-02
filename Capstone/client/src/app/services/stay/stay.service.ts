@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {StayInfo} from '../../models/stay-info';
 import {Rate} from '../../models/rate';
 import {Room} from '../../models/room-status';
+import {CreditCard} from '../../models/credit-card';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import {Room} from '../../models/room-status';
 export class StayService {
 
   currentStay!:StayInfo;
+  currentCreditCardInfo?: CreditCard;
   private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 
@@ -68,9 +70,21 @@ export class StayService {
 
   saveOneRoom( room:Room )
   {
-    console.log(room);
     return this.http.put<Room>(`${this.url}/room/assign-a-room`, room);
-    //Nick problem might be here
+  }
+
+  searchForStays(queryParameter: string | number)
+  {
+    let queryObject;
+    if(typeof queryParameter === "string")
+    {
+      queryObject = {lastName: queryParameter}
+    }
+    else
+    {
+      queryObject = {stayId: queryParameter}
+    }
+    return this.http.post<StayInfo[]>(`${this.url}/stay/search`, queryObject);
   }
 
 }

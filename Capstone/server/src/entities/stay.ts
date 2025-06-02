@@ -31,7 +31,7 @@ class Stay
     @Column({name: 'PROPERTY_ID', type: 'int', unsigned: true})
     propertyId!: number;
 
-    @ManyToOne(() => Guest, guest => guest.stays)
+    @ManyToOne(() => Guest, guest => guest.stays, {cascade:["update", "insert"]})
     @JoinColumn({name: 'GUEST_ID'})
     guest!: Guest;
     //creates a new type, fixes the circular dependency wowowowow

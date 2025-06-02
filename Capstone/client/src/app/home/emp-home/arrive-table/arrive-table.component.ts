@@ -68,8 +68,26 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
         this.dataSource.data = inHouseGuests;
       });
     }
+    else if(this.tableType === "searchResults")
+    {
 
+      const searchRouteValue = this.route.snapshot.paramMap.get("searchValue");
 
+      const searchValue = parseInt(searchRouteValue!);
+
+      if(!isNaN(searchValue))
+      {
+        this.stayService.searchForStays(searchValue).subscribe(data => {
+          this.dataSource.data = data;
+        });
+      }
+      else
+      {
+        this.stayService.searchForStays(searchRouteValue!).subscribe(data => {
+          this.dataSource.data = data;
+        });
+      }
+    }
   }
 
   ngAfterViewInit()

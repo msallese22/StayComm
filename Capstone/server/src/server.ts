@@ -10,7 +10,6 @@ import {Employee} from "./entities/employee";
 import {Property} from "./entities/property";
 import {Brackets, Repository} from "typeorm";
 import {RatePrice} from "./entities/rate-price";
-import {json} from "node:stream/consumers";
 
 const app: Express = express();
 const port: number = 3000;
@@ -193,14 +192,29 @@ AppDataSource.initialize()//initializing where the database is to go!
             const savedRoomList = await roomStatus.find();
             res.json(savedRoomList);
         });
-        //Nick is put request right
         app.put('/room/assign-a-room', async (req, res) =>
         {
             const roomData = req.body;
             const roomRepository = AppDataSource.getRepository(Room);
+
+            const alreadyAssignedRoom = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .innerJoinAndSelect("room.stay", "stay")
+                .where("stay.stayId = :stayId", {stayId: roomData.stay.stayId})
+                .getOne();
+            console.log(alreadyAssignedRoom);
+            if(alreadyAssignedRoom)
+            {
+                alreadyAssignedRoom.stay = null;
+                alreadyAssignedRoom.roomIsBlocked = false;
+                await roomRepository.save(alreadyAssignedRoom);
+
+                roomData.stay.room = [];
+            }
+
             const existingRoom = await roomRepository.findOneBy({
                 roomId: roomData.id
             });
+
             if (!existingRoom)
             {
                 res.status(404).json({
@@ -212,7 +226,6 @@ AppDataSource.initialize()//initializing where the database is to go!
             roomRepository.merge(existingRoom, roomData);
             //forcing the objects to merge!!
             existingRoom.stay = roomData.stay;
-            console.log(roomData);
             try
             {
                 const updatedRoom = await roomRepository.save(existingRoom);
@@ -287,18 +300,31 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
 
             const stayRepository: Repository<any> = AppDataSource.getRepository(Stay);
+            const guestRepository: Repository<any> = AppDataSource.getRepository(Guest);
+            const creditCardRepository: Repository<any> = AppDataSource.getRepository(CreditCard);
 
-            if (stayData.guest.guestId === 0)
-            {
-                stayData.guest.guestId = undefined;
-                //make a new guest, bestie!
-            }
+
 
             if (stayData.guest.creditCards[0].creditCardId === 0)
             {
-                stayData.guest.creditCards[0].creditCardId = undefined;
+
+                const maxId = await creditCardRepository.maximum("creditCardId");
+                stayData.guest.creditCards[0].creditCardId = maxId ? maxId + 1 : 100;
+
+
                 //smallest Russian doll
             }
+
+            if (stayData.guest.guestId === 0)
+            {
+                const maxId = await guestRepository.maximum("guestId");
+                stayData.guest.guestId = maxId ? maxId + 1 : 100;
+
+                stayData.guest.guestPassword = undefined;
+
+                //make a new guest, bestie!
+            }
+
 
             if (stayData.stayId === 0)
             {
@@ -345,14 +371,10 @@ AppDataSource.initialize()//initializing where the database is to go!
         //getting a list of ratePrices, returning the sum of them to the stay?
         app.post('/rate/rate-price', async (req, res) =>
         {
-            console.log(req.body);
             const checkinDate = new Date(req.body.checkinDate);
             const checkoutDate = new Date(req.body.checkoutDate);
 
             checkoutDate.setDate(checkoutDate.getDate() - 1);
-
-
-            //this is broken. somewhere
 
 
             const totalRate = await AppDataSource.getRepository(RatePrice).createQueryBuilder("ratePrice")
@@ -410,7 +432,7 @@ AppDataSource.initialize()//initializing where the database is to go!
 
             const stayById = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .innerJoinAndSelect("stay.guest", "guest")
-                .innerJoinAndSelect("guest.creditCards", "creditCard")
+                .leftJoinAndSelect("guest.creditCards", "creditCard")
                 .leftJoinAndSelect("stay.room", "room")
                 .where("stay.stayId = :id", {id: id})
                 .getOne();
@@ -461,46 +483,110 @@ AppDataSource.initialize()//initializing where the database is to go!
 
         app.get('/get-availability', async (req, res) =>
         {
-            const availableRooms = await AppDataSource.getRepository(Room).createQueryBuilder("room")
-                .leftJoinAndSelect("room.stay", "stay")
-                .where("stay.stayCheckinDate >= :checkinDate OR stay.stayCheckoutDate <= :checkoutDate OR room.stay IS NULL", {
-                    checkinDate: dateObject,
-                    checkoutDate: dateObject
-                })
+            const yesterday = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            const allRooms = await AppDataSource.getRepository(Room).createQueryBuilder("room")
                 .getCount();
-            const availableKings = await AppDataSource.getRepository(Room).createQueryBuilder("room")
-                .leftJoinAndSelect("room.stay", "stay")
+            console.log("Room count");
+            console.log(allRooms);
+
+            const currentStays = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .where(new Brackets(qb => {
-                    qb.where("stay.stayCheckinDate >= :checkinDate", {checkinDate: dateObject})
-                        .orWhere("stay.stayCheckoutDate <= :checkoutDate", {checkoutDate: dateObject})
-                        .orWhere("room.stay IS NULL")
+                   qb.where( "stay.stayCheckinDate >= :checkinDate", {checkinDate : yesterday})
+                       .orWhere("stay.stayCheckoutDate = :checkoutDate", {checkoutDate:dateObject})
                 }))
-                .andWhere("room.roomType = 'K'")
+                .andWhere(new Brackets(qb => {
+                    qb.where( "stay.stayIsCheckedIn IS NULL")
+                        .orWhere("stay.stayIsCheckedIn = 1")
+                }))
+                .andWhere("stay.stayIsCanceled = 0")
                 .getCount();
-            const availableQueens = await AppDataSource.getRepository(Room).createQueryBuilder("room")
-                .leftJoinAndSelect("room.stay", "stay")
+            console.log("current stays");
+            console.log(currentStays);
+
+            console.log("yesterday");
+            console.log(yesterday);
+
+
+            const allKings = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .where("room.roomType = 'K'")
+                .getCount();
+
+            const currentKingStays = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
                 .where(new Brackets(qb => {
-                    qb.where("stay.stayCheckinDate >= :checkinDate", {checkinDate: dateObject})
-                        .orWhere("stay.stayCheckoutDate <= :checkoutDate", {checkoutDate: dateObject})
-                        .orWhere("room.stay IS NULL")
+                    qb.where( "stay.stayCheckinDate >= :checkinDate", {checkinDate : yesterday})
+                        .orWhere("stay.stayCheckoutDate = :checkoutDate", {checkoutDate:dateObject})
                 }))
-                .andWhere("room.roomType = 'Q'")
+                .andWhere("stay.roomType = 'K'")
+                .andWhere(new Brackets(qb => {
+                    qb.where( "stay.stayIsCheckedIn IS NULL")
+                        .orWhere("stay.stayIsCheckedIn = 1")
+                }))
+                .andWhere("stay.stayIsCanceled = 0")
                 .getCount();
-            if (!availableRooms)
+
+
+            const allQueens = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .where("room.roomType = 'Q'")
+                .getCount();
+
+            const currentQueenStays = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .where(new Brackets(qb => {
+                    qb.where( "stay.stayCheckinDate >= :checkinDate", {checkinDate : yesterday})
+                        .orWhere("stay.stayCheckoutDate = :checkoutDate", {checkoutDate:dateObject})
+                }))
+                .andWhere("stay.roomType = 'Q'")
+                .andWhere(new Brackets(qb => {
+                    qb.where( "stay.stayIsCheckedIn IS NULL")
+                        .orWhere("stay.stayIsCheckedIn = 1")
+                }))
+                .andWhere("stay.stayIsCanceled = 0")
+                .getCount();
+
+
+            if(allRooms)
             {
-                //truthy falsy.
-                res.status(404).json({
-                    message: `Room availability not found :( Valtor booked them all`
-                });
-            }
-            else
-            {
+             let availableKings = 0;
+             let availableQueens = 0;
+             let availableRooms = 0;
+                if(currentStays)
+                {
+                 availableRooms = allRooms - currentStays;
+                }
+                else
+                {
+                    availableRooms = allRooms;
+                }
+                if(currentKingStays)
+                {
+                    availableKings = allKings - currentKingStays;
+                }
+                else
+                {
+                    availableKings = allKings;
+                }
+                if(currentQueenStays)
+                {
+                    availableQueens = allQueens - currentQueenStays;
+                }
+                else
+                {
+                    availableQueens = allQueens;
+                }
                 const allAvailableRooms = {
                     totalAvailability: availableRooms,
                     totalAvailableKings: availableKings,
                     totalAvailableQueens: availableQueens
                 };
                 res.json(allAvailableRooms);//send the product as a json response.
+            }
+            else
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `Room availability not found :( Valtor booked them all`
+                });
             }
         });
 
@@ -558,6 +644,59 @@ AppDataSource.initialize()//initializing where the database is to go!
                 }
             }
         });
+
+        app.post('/stay/search', async (req, res) =>
+        {
+            const lastName:string = req.body.lastName;
+            const stayId:number = req.body.stayId;
+
+            if(lastName)
+            {
+                const stayByLastName = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                    .innerJoinAndSelect("stay.guest", "guest")
+                    .leftJoinAndSelect("guest.creditCards", "creditCard")
+                    .leftJoinAndSelect("stay.room", "room")
+                    .where("guest.guestLname = :lastName" ,{lastName:lastName} )
+                    .getMany();
+
+                if (!stayByLastName)
+                {
+                    res.status(404).json({
+                        message: `Stay with last name ${lastName} not found.`
+                    });
+                }
+                else
+                {
+                    res.json(stayByLastName);
+                }
+            }
+            else if(stayId)
+            {
+                const stayById = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                    .innerJoinAndSelect("stay.guest", "guest")
+                    .leftJoinAndSelect("guest.creditCards", "creditCard")
+                    .leftJoinAndSelect("stay.room", "room")
+                    .where("stay.stayId = :id", {id: stayId})
+                    .getOne();
+
+                if (!stayById)
+                {
+                    res.status(404).json({
+                        message: `Stay with ID ${stayId} not found.`
+                    });
+                }
+                else
+                {
+                    res.json(stayById);
+                }
+            }
+            else
+            {
+                res.status(404).json({
+                    message: 'No stays found.'
+                });
+            }
+        })
     });
 
 

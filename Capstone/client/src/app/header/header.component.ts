@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {NgOptimizedImage} from '@angular/common';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {LoginService} from '../services/login/login.service';
 
 @Component({
@@ -16,6 +16,7 @@ import {LoginService} from '../services/login/login.service';
 export class HeaderComponent implements OnInit{
   isEmployee!:boolean|null;
   private login = inject(LoginService)
+  router = inject(Router);
 
 
   ngOnInit()
@@ -24,6 +25,14 @@ export class HeaderComponent implements OnInit{
       this.isEmployee = value;
     })
   }
+
+
+  navigateToHome()
+  {
+    this.router.navigate(["/home", {employee: this.isEmployee}])
+
+  }
+
 }
 
 
