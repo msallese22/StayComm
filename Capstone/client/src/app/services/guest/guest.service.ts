@@ -14,4 +14,6 @@ export class GuestService {
     return this.http.get<Guest>(`${this.url}/guest-info/${id}`);
   }
 
+
+
 }

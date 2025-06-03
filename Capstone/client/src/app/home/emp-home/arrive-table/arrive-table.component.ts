@@ -6,7 +6,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {StayInfo} from '../../../models/stay-info';
 import {StayService} from '../../../services/stay/stay.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {RoomService} from '../../../services/room/room.service';
+import {LoginService} from '../../../services/login/login.service';
 
 @Component({
   selector: 'app-arrive-table',
@@ -26,6 +26,7 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
   @ViewChild(MatSort) sort!: MatSort;
 
   private stayService = inject(StayService);
+  private loginService = inject(LoginService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -68,6 +69,20 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
         this.dataSource.data = inHouseGuests;
       });
     }
+    else if(this.tableType === "checkedInByGuestId")
+    {
+      this.stayService.getCheckedInStayById(this.loginService.guest.guestId).subscribe(checkedInByGuestId =>
+      {
+        this.dataSource.data = checkedInByGuestId;
+      });
+    }
+    else if(this.tableType === "byGuestId")
+    {
+      this.stayService.getGuestStaysById(this.loginService.guest.guestId).subscribe(getGuestStaysById =>
+      {
+        this.dataSource.data = getGuestStaysById;
+      });
+    }
     else if(this.tableType === "searchResults")
     {
 
@@ -88,6 +103,7 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
         });
       }
     }
+
   }
 
   ngAfterViewInit()
@@ -106,9 +122,13 @@ export class ArriveTableComponent implements AfterViewInit, OnInit
       {
         this.router.navigate(['/new-stay', {stayId: stayId, formType: "checkOut"}])
       }
-      else if(this.tableType === "inHouseGuests")
+      else if(this.tableType === "inHouseGuests" || this.tableType === "checkedInByGuestId")
       {
         this.router.navigate(['/new-stay', {stayId: stayId, formType: "inHouseGuests"}])
+      }
+      else if(this.tableType === "searchResults" || this.tableType === "byGuestId")
+      {
+        this.router.navigate(['/new-stay', {stayId: stayId, formType: "edit"}])
       }
   }
 

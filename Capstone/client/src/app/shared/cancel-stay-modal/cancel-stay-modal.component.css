@@ -1,0 +1,18 @@
+.center-text{
+  text-align: center;
+}
+
+.bigger-text{
+  font-size: 20px;
+}
+
+.modal-button{
+  background-color: #55ba2a;
+  color: white;
+  width: 50%;
+}
+
+.fix-button{
+  display: flex;
+  justify-content: center;
+}

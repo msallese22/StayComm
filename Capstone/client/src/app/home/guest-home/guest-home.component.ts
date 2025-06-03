@@ -28,5 +28,14 @@ export class GuestHomeComponent implements OnInit {
     this.router.navigate(['/new-stay', { isEdit: false}]);
   }
 
+  staysByGuestId()
+  {
+    this.router.navigate(['master-table', {tableType: "byGuestId"}])
+  }
+
+  checkedInStaysByGuestId()
+  {
+    this.router.navigate(['master-table', {tableType: "checkedInByGuestId"}])
+  }
 
 }

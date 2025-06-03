@@ -73,6 +73,16 @@ export class StayService {
     return this.http.put<Room>(`${this.url}/room/assign-a-room`, room);
   }
 
+  getGuestStaysById(id:number)
+  {
+    return this.http.get<StayInfo[]>(`${this.url}/stay/stays-by-guest-id/${id}`);
+  }
+
+  getCheckedInStayById(id:number)
+  {
+    return this.http.get<StayInfo[]>(`${this.url}/stay/checked-in-by-guest-id/${id}`);
+  }
+
   searchForStays(queryParameter: string | number)
   {
     let queryObject;

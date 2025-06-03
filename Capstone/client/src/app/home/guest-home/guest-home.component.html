@@ -4,11 +4,11 @@
     <a (click)="newStay()" class="book square-shapes">
       Book a New Stay
     </a>
-    <a class="gradient-box square-shapes">
+    <a class="gradient-box square-shapes" (click)="checkedInStaysByGuestId()">
       Your Current Stay
     </a>
-    <a class="upcoming square-shapes">
-      Your Upcoming Stays
+    <a class="upcoming square-shapes" (click)="staysByGuestId()">
+      Your Stays
     </a>
   </div>
 </div>

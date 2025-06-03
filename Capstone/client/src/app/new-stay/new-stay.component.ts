@@ -24,7 +24,7 @@ import {GuestService} from '../services/guest/guest.service';
 import {StayInfo} from '../models/stay-info';
 import {Guest} from '../models/guest-interface';
 import {Rate} from '../models/rate';
-import {Room} from '../models/room-status'
+import {Room} from '../models/room-status';
 import {CurrencyPipe} from '@angular/common';
 import {AreYouSureModalComponent} from '../shared/are-you-sure-modal/are-you-sure-modal.component';
 import {CancelStayModalComponent} from '../shared/cancel-stay-modal/cancel-stay-modal.component';
@@ -76,7 +76,8 @@ export class NewStayComponent implements OnInit
 
 
   constructor()
-  {}
+  {
+  }
 
   readonly minDate = new Date();
   readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
@@ -128,7 +129,7 @@ export class NewStayComponent implements OnInit
 
   get newStayFormInvalid()
   {
-    if(this.formType === 'checkIn')
+    if (this.formType === 'checkIn')
     {
       return this.roomNumber === undefined || this.newStayForm.invalid;
     }
@@ -153,12 +154,13 @@ export class NewStayComponent implements OnInit
 
 
     //can we make it so if the email address or phone number matches an entry in the database, it populates the other stuff??
-    //gotta get this out, Valtor can't be the only one allowed to make stays forever!
-    if(!this.loginService.isEmployee)
+
+    if (this.loginService.employee === undefined)
     {
       this.guestService.getGuestById(this.loginService.guest.guestId).subscribe(data =>
       {
         this.guest = data;
+        console.log(data);
         this.guestInfoFormGroup.get("guestFirstName")?.setValue(data.guestFname);
         this.guestInfoFormGroup.get("guestLastName")?.setValue(data.guestLname);
         this.guestInfoFormGroup.get("guestPhone")?.setValue(data.guestPhone);
@@ -181,7 +183,7 @@ export class NewStayComponent implements OnInit
           next: (data) =>
           {
 
-            if(this.roomService.currentRoom)
+            if (this.roomService.currentRoom)
             {
               this.roomNumber = `Room ${this.roomService.currentRoom.roomId}`;
             }
@@ -189,10 +191,10 @@ export class NewStayComponent implements OnInit
             {
               this.roomService.getRoomByStayId(+stayId).subscribe(room =>
               {
-                this.room = room
+                this.room = room;
                 if (!this.room?.stay)
                 {
-                  this.roomNumber = "Assign A Room"
+                  this.roomNumber = "Assign A Room";
                 }
                 else
                 {
@@ -202,13 +204,13 @@ export class NewStayComponent implements OnInit
             }
             this.stay = data;
             this.modifiedStay = {...data};
-            if(this.stayService.currentCreditCardInfo)
+            if (this.stayService.currentCreditCardInfo)
             {
               this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(this.stayService.currentCreditCardInfo.creditCardNum);
               this.creditCardInfoFormGroup.get("creditCardExp")?.setValue(this.stayService.currentCreditCardInfo.creditCardExp);
               this.creditCardInfoFormGroup.get("creditCardCvv")?.setValue(this.stayService.currentCreditCardInfo.creditCardCvv);
             }
-            else if(this.modifiedStay.guest.creditCards && this.modifiedStay.guest.creditCards.length > 0)
+            else if (this.modifiedStay.guest.creditCards && this.modifiedStay.guest.creditCards.length > 0)
             {
               this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(this.modifiedStay.guest.creditCards[0].creditCardNum);
               this.creditCardInfoFormGroup.get("creditCardExp")?.setValue(this.modifiedStay.guest.creditCards[0].creditCardExp);
@@ -217,8 +219,8 @@ export class NewStayComponent implements OnInit
 
             this.stayService.currentStay = this.stay;
 
-            this.newStayForm.get("checkInDate")?.setValue(`${this.modifiedStay.stayCheckinDate}`);
-            this.newStayForm.get("checkOutDate")?.setValue(`${this.modifiedStay.stayCheckoutDate}`);
+            this.newStayForm.get("checkInDate")?.setValue(new Date(`${this.modifiedStay.stayCheckinDate}T00:00:00.000`).toISOString());
+            this.newStayForm.get("checkOutDate")?.setValue(new Date(`${this.modifiedStay.stayCheckoutDate}T00:00:00.000`).toISOString());
             this.newStayForm.get("roomType")?.setValue(this.modifiedStay.roomType);
             this.setRoomType(this.modifiedStay.roomType);
             this.guestInfoFormGroup.get("guestFirstName")?.setValue(this.modifiedStay.guest.guestFname);
@@ -273,7 +275,7 @@ export class NewStayComponent implements OnInit
 
       if ((this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
         || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.valid
-      || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.disabled)
+        || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.disabled)
       {
 
         this.stayService.postRateList(checkInDateExists!, checkOutDateExists!).subscribe(rates =>
@@ -339,7 +341,7 @@ export class NewStayComponent implements OnInit
           });
           dialogRef.afterClosed().subscribe(() =>
           {
-            this.router.navigateByUrl("/home");
+            this.router.navigate(["/home", {employee: this.loginService.employee !== undefined}]);
           });
         });
       }
@@ -349,16 +351,20 @@ export class NewStayComponent implements OnInit
 
   routeToRoomTable()
   {
-    if(this.newStayForm.valid)
+    if (this.newStayForm.valid)
     {
       this.stayService.currentCreditCardInfo = {
         creditCardNum: this.creditCardInfoFormGroup.get("creditCardNum")!.value,
         creditCardExp: this.creditCardInfoFormGroup.get("creditCardExp")!.value,
         creditCardCvv: this.creditCardInfoFormGroup.get("creditCardCvv")!.value,
         creditCardId: 0
-      }
+      };
     }
-    this.router.navigate(['/room-status', {roomFormType: "block", stayId: this.stay!.stayId, stayRoomType: this.stay!.roomType}]);
+    this.router.navigate(['/room-status', {
+      roomFormType: "block",
+      stayId: this.stay!.stayId,
+      stayRoomType: this.stay!.roomType
+    }]);
   }
 
   openDialog(): void
@@ -366,6 +372,8 @@ export class NewStayComponent implements OnInit
     const formValue = this.newStayForm.value;
     const guestFormGroupValue = this.guestInfoFormGroup.value;
     const creditCardFormGroupValue = this.creditCardInfoFormGroup.value;
+
+    console.log(formValue.checkInDate);
 
     const newStay: StayInfo = {
       stayId: 0,
@@ -415,6 +423,22 @@ export class NewStayComponent implements OnInit
     }
     else if (this.modifiedStay)
     {
+      this.modifiedStay.stayCheckinDate = formValue.checkInDate ? new Date(formValue.checkInDate) : new Date();
+      this.modifiedStay.stayCheckoutDate = formValue.checkOutDate ? new Date(formValue.checkOutDate) : new Date();
+      this.modifiedStay.roomType = formValue.roomType ? formValue.roomType : "K";
+
+      this.modifiedStay.guest.guestFname = guestFormGroupValue.guestFirstName ? guestFormGroupValue.guestFirstName : "";
+      this.modifiedStay.guest.guestLname = guestFormGroupValue.guestLastName ? guestFormGroupValue.guestLastName : "";
+      this.modifiedStay.guest.guestEmail = guestFormGroupValue.guestEmail ? guestFormGroupValue.guestEmail : "";
+      this.modifiedStay.guest.guestPhone = guestFormGroupValue.guestPhone ? guestFormGroupValue.guestPhone : "";
+
+      this.modifiedStay.guest.creditCards[0].creditCardNum = creditCardFormGroupValue.creditCardNum ? creditCardFormGroupValue.creditCardNum : "";
+      this.modifiedStay.guest.creditCards[0].creditCardExp = creditCardFormGroupValue.creditCardExp ? creditCardFormGroupValue.creditCardExp : "";
+      this.modifiedStay.guest.creditCards[0].creditCardCvv = creditCardFormGroupValue.creditCardCvv ? creditCardFormGroupValue.creditCardCvv : "";
+
+      this.modifiedStay.stayIsCanceled = formValue.stayIsCanceled ? formValue.stayIsCanceled : false,
+        this.modifiedStay.stayIsCheckedIn = null;
+
       if (this.formType === 'inHouseGuests')
       {
         this.router.navigate(['/home', {employee: this.loginService.employee !== undefined}]);
@@ -424,21 +448,20 @@ export class NewStayComponent implements OnInit
         if (this.formType === 'checkIn')
         {
           this.modifiedStay.stayIsCheckedIn = true;
-          if(this.roomService.currentRoom)
+          if (this.roomService.currentRoom)
           {
             this.modifiedStay.room = [this.roomService.currentRoom];
           }
         }
-        else if(this.formType === 'checkOut')
+        else if (this.formType === 'checkOut')
         {
           this.modifiedStay.stayIsCheckedIn = false;
-          if(this.modifiedStay.room && this.modifiedStay.room.length > 0)
+          if (this.modifiedStay.room && this.modifiedStay.room.length > 0)
           {
             this.modifiedStay.room[0].roomIsBlocked = false;
             this.modifiedStay.room[0].roomIsClean = false;
           }
         }
-
         this.stayService.updateStay(this.modifiedStay).subscribe(data =>
         {
           this.stayService.currentCreditCardInfo = undefined;
