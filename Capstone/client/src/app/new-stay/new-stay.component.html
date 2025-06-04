@@ -93,6 +93,7 @@
         </div>
       </div>
     </div>
+      <div class="sold-out-message"><p>{{this.noRoomsAvailable}}</p></div>
     <div class="bottom-row">
       <div class="room-type">
         <p>Select A Room Type</p>
@@ -128,7 +129,7 @@
             <p>Waiting for dates to be selected...</p>
           } @else{
          <p> {{ totalCost | currency }} </p>}</div>
-        <mat-icon class="material-symbols-outlined info" [matTooltip]="toolTipMessage">info</mat-icon>
+        <mat-icon class="material-symbols-outlined info fix-tool-tip" [matTooltip]="toolTipMessage">info</mat-icon>
       </div>
       <div class="credit-card" [formGroup]="creditCardInfoFormGroup">
         <div class="style-credit-card">

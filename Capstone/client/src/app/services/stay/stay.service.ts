@@ -5,6 +5,7 @@ import {StayInfo} from '../../models/stay-info';
 import {Rate} from '../../models/rate';
 import {Room} from '../../models/room-status';
 import {CreditCard} from '../../models/credit-card';
+import {Availability} from '../../models/availability';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class StayService {
 
   currentStay!:StayInfo;
   currentCreditCardInfo?: CreditCard;
+  availability!:Availability;
   private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 
@@ -95,6 +97,20 @@ export class StayService {
       queryObject = {stayId: queryParameter}
     }
     return this.http.post<StayInfo[]>(`${this.url}/stay/search`, queryObject);
+  }
+
+  getRoomAvailability()
+  {
+    return this.http.get<Availability>(`${this.url}/get-availability`);
+  }
+
+  getAvailabilityByDay(checkinDate:Date, checkoutDate:Date)
+  {
+    const body = {
+      checkinDate: checkinDate,
+      checkoutDate: checkoutDate
+    }
+    return this.http.post<Availability>(`${this.url}/get-availability-by-day`, body);
   }
 
 }

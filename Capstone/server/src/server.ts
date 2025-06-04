@@ -317,11 +317,22 @@ AppDataSource.initialize()//initializing where the database is to go!
 
             if (stayData.guest.guestId === 0)
             {
-                const maxId = await guestRepository.maximum("guestId");
-                stayData.guest.guestId = maxId ? maxId + 1 : 100;
+                const guest = await AppDataSource.getRepository(Guest).createQueryBuilder("guest")
+                    .innerJoinAndSelect("guest.creditCards", "creditCard")
+                    .where("guest.guestEmail = :email", {email: stayData.guest.guestEmail})
+                    .getOne();
 
-                stayData.guest.guestPassword = undefined;
+                if(guest)
+                {
+                    stayData.guest = guest;
+                }
+                else
+                {
+                    const maxId = await guestRepository.maximum("guestId");
+                    stayData.guest.guestId = maxId ? maxId + 1 : 100;
 
+                    stayData.guest.guestPassword = undefined;
+                }
                 //make a new guest, bestie!
             }
 
@@ -631,6 +642,111 @@ AppDataSource.initialize()//initializing where the database is to go!
             }
         });
 
+        app.post('/get-availability-by-day', async (req, res) =>
+        {
+
+            const checkinDate =  formatDates(new Date(req.body.checkinDate));
+            const checkoutDate = formatDates(new Date(req.body.checkoutDate));
+
+
+            const allRooms = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .getCount();
+            console.log("Room count");
+            console.log(allRooms);
+
+            const currentStays = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .where(new Brackets(qb => {
+                    qb.where( "stay.stayCheckinDate <= :checkinDate", {checkinDate:checkinDate})
+                        .andWhere("stay.stayCheckoutDate >= :checkoutDate", {checkoutDate:checkoutDate})
+                }))
+                .andWhere(new Brackets(qb => {
+                    qb.where( "stay.stayIsCheckedIn IS NULL")
+                        .orWhere("stay.stayIsCheckedIn = 1")
+                }))
+                .andWhere("stay.stayIsCanceled = 0")
+                .getCount();
+
+            const allKings = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .where("room.roomType = 'K'")
+                .getCount();
+
+            const currentKingStays = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .where(new Brackets(qb => {
+                    qb.where( "stay.stayCheckinDate <= :checkinDate", {checkinDate:checkinDate})
+                        .andWhere("stay.stayCheckoutDate >= :checkoutDate", {checkoutDate:checkoutDate})
+                }))
+                .andWhere("stay.roomType = 'K'")
+                .andWhere(new Brackets(qb => {
+                    qb.where( "stay.stayIsCheckedIn IS NULL")
+                        .orWhere("stay.stayIsCheckedIn = 1")
+                }))
+                .andWhere("stay.stayIsCanceled = 0")
+                .getCount();
+
+
+            const allQueens = await AppDataSource.getRepository(Room).createQueryBuilder("room")
+                .where("room.roomType = 'Q'")
+                .getCount();
+
+            const currentQueenStays = await AppDataSource.getRepository(Stay).createQueryBuilder("stay")
+                .where(new Brackets(qb => {
+                    qb.where( "stay.stayCheckinDate <= :checkinDate", {checkinDate:checkinDate})
+                        .andWhere("stay.stayCheckoutDate >= :checkoutDate", {checkoutDate:checkoutDate})
+                }))
+                .andWhere("stay.roomType = 'Q'")
+                .andWhere(new Brackets(qb => {
+                    qb.where( "stay.stayIsCheckedIn IS NULL")
+                        .orWhere("stay.stayIsCheckedIn = 1")
+                }))
+                .andWhere("stay.stayIsCanceled = 0")
+                .getCount();
+
+
+            if(allRooms)
+            {
+                let availableKings = 0;
+                let availableQueens = 0;
+                let availableRooms = 0;
+                if(currentStays)
+                {
+                    availableRooms = allRooms - currentStays;
+                }
+                else
+                {
+                    availableRooms = allRooms;
+                }
+                if(currentKingStays)
+                {
+                    availableKings = allKings - currentKingStays;
+                }
+                else
+                {
+                    availableKings = allKings;
+                }
+                if(currentQueenStays)
+                {
+                    availableQueens = allQueens - currentQueenStays;
+                }
+                else
+                {
+                    availableQueens = allQueens;
+                }
+                const allAvailableRooms = {
+                    totalAvailability: availableRooms,
+                    totalAvailableKings: availableKings,
+                    totalAvailableQueens: availableQueens
+                };
+                res.json(allAvailableRooms);//send the product as a json response.
+            }
+            else
+            {
+                //truthy falsy.
+                res.status(404).json({
+                    message: `Room availability not found :( Valtor booked them all`
+                });
+            }
+        });
+
         app.post('/login', async (req, res) =>
         {
             const email = req.body.email;
@@ -741,6 +857,7 @@ AppDataSource.initialize()//initializing where the database is to go!
     });
 
 
+
 function getDatesInRange(checkinDate: Date, checkoutDate: Date)
 {
     const date = new Date(checkinDate.getTime());
@@ -756,3 +873,33 @@ function getDatesInRange(checkinDate: Date, checkoutDate: Date)
     return dates;
 }
 
+
+function formatDates(date:Date)
+{
+    let formattedCheckinDate;
+
+    if(date.getMonth() < 10)
+    {
+        if(date.getDate() < 10)
+        {
+            formattedCheckinDate = `${date.getFullYear()}-0${date.getMonth()+1}-0${date.getDate()}`
+        }
+        else
+        {
+            formattedCheckinDate = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}`
+        }
+    }
+    else
+    {
+        if(date.getDate() < 10)
+        {
+            formattedCheckinDate = `${date.getFullYear()}-${date.getMonth()+1}-0${date.getDate()}`
+        }
+        else
+        {
+            formattedCheckinDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
+        }
+    }
+
+    return formattedCheckinDate;
+}

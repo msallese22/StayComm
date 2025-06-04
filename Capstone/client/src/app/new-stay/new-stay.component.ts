@@ -31,6 +31,8 @@ import {CancelStayModalComponent} from '../shared/cancel-stay-modal/cancel-stay-
 import {RoomService} from '../services/room/room.service';
 import {LoginService} from '../services/login/login.service';
 import {CreditCard} from '../models/credit-card';
+import {count} from 'rxjs';
+import {Availability} from '../models/availability';
 
 @Component({
   selector: 'app-new-stay',
@@ -74,7 +76,6 @@ export class NewStayComponent implements OnInit
   room: Room | null = null;
   roomNumber: string | undefined;
 
-
   constructor()
   {
   }
@@ -93,7 +94,13 @@ export class NewStayComponent implements OnInit
   //and for some reason it's not putting the stuff on new lines every time. does it need to be a for loop???
 
   roomType: string[] | null = ['King', 'Queen'];
-//ADD RESERVATION NOTES!
+
+  noRoomsAvailable: string = "";
+  availableKingsCount: number = 0;
+  availableQueensCount: number = 0;
+  totalAvailabilityCount: number = 0;
+
+  availability!: Availability;
 
 
   newStayForm = new FormGroup({
@@ -135,20 +142,23 @@ export class NewStayComponent implements OnInit
     }
     else
     {
-      return this.newStayForm.invalid;
+      return this.newStayForm.invalid ||
+        (this.king === true && this.availableKingsCount <= 0) ||
+        (this.king === false && this.availableQueensCount <= 0) ||
+        this.totalAvailabilityCount <= 0;
     }
   }
 
 
   ngOnInit(): void
   {
-    this.creditCardInfoFormGroup.get("creditCardNumber")?.valueChanges.subscribe(value =>
+    this.creditCardInfoFormGroup.get("creditCardNum")?.valueChanges.subscribe(value =>
     {
       if (value.length === 16)
       {
         const lastFour = value.substring(12);
         const abstractedNumbers = "XXXXXXXXXXXX" + lastFour;
-        this.creditCardInfoFormGroup.get("creditCardNumber")?.setValue(abstractedNumbers, {emitEvent: false});
+        this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(abstractedNumbers, {emitEvent: false});
       }
     });
 
@@ -202,6 +212,8 @@ export class NewStayComponent implements OnInit
                 }
               });
             }
+
+
             this.stay = data;
             this.modifiedStay = {...data};
             if (this.stayService.currentCreditCardInfo)
@@ -263,6 +275,35 @@ export class NewStayComponent implements OnInit
     }
   }
 
+formatDates(date:Date)
+{
+  let formattedCheckinDate;
+
+  if(date.getMonth() < 10)
+  {
+    if(date.getDate() < 10)
+    {
+      formattedCheckinDate = `${date.getFullYear()}-0${date.getMonth()+1}-0${date.getDate()}`
+    }
+    else
+    {
+      formattedCheckinDate = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}`
+    }
+  }
+  else
+  {
+    if(date.getDate() < 10)
+    {
+      formattedCheckinDate = `${date.getFullYear()}-${date.getMonth()+1}-0${date.getDate()}`
+    }
+    else
+    {
+      formattedCheckinDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
+    }
+  }
+
+  return formattedCheckinDate;
+}
   pickMyDates(event?: MatDatepickerInputEvent<Date>)
   {
     this.totalCost = 0;
@@ -277,6 +318,7 @@ export class NewStayComponent implements OnInit
         || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.valid
         || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.disabled)
       {
+        this.getAvailabilityByDay();
 
         this.stayService.postRateList(checkInDateExists!, checkOutDateExists!).subscribe(rates =>
         {
@@ -285,13 +327,15 @@ export class NewStayComponent implements OnInit
           {
             this.totalCost += +rate.ratePricePrice;
             //TODO format this better
-            this.toolTipMessage += `${rate.rateDate}: ${rate.ratePricePrice}`;
+            this.toolTipMessage += `${this.formatDates(new Date(rate.rateDate))}: $${rate.ratePricePrice} \n`;
           });
         });
       }
     }
 
   }
+
+
 
 //returns if King RoomType or Queen RoomType has been selected. RoomType is set to null before a selection is made
   setRoomType(roomType: string)
@@ -300,6 +344,8 @@ export class NewStayComponent implements OnInit
     this.newStayForm.updateValueAndValidity();
 
     this.king = roomType === 'K';
+
+    this.getAvailabilityByDay();
   }
 
   cancelStay(stayIsCanceled: boolean)
@@ -484,5 +530,43 @@ export class NewStayComponent implements OnInit
       }
     }
   }
-}
 
+  getAvailabilityByDay()
+  {
+    if (this.newStayForm.get("checkInDate") && this.newStayForm.get("checkOutDate"))
+    {
+      const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date();
+      const checkOutDateExists = this.newStayForm.get("checkOutDate")!.value ? new Date(this.newStayForm.get("checkOutDate")!.value!) : new Date();
+
+      if ((this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
+        || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.valid
+        || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.disabled)
+      {
+
+        this.stayService.getAvailabilityByDay(checkInDateExists, checkOutDateExists).subscribe((count =>
+        {
+          this.totalAvailabilityCount = count.totalAvailability;
+          this.availableKingsCount = count.totalAvailableKings;
+          this.availableQueensCount = count.totalAvailableQueens;
+          if (this.availableKingsCount <= 0 && this.king === true)
+          {
+              this.noRoomsAvailable = "King Rooms are sold out";
+          }
+          else if (this.availableQueensCount <= 0 && this.king === false)
+          {
+              this.noRoomsAvailable = "Queen Rooms are sold out";
+          }
+          else if (this.totalAvailabilityCount <= 0)
+          {
+            this.noRoomsAvailable = "Nickhill Suites is sold out for these dates.";
+          }
+          else
+          {
+            this.noRoomsAvailable = "";
+          }
+        }));
+      }
+
+    }
+  }
+}

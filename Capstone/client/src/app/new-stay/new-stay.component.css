@@ -113,6 +113,7 @@
   height: 230px;
   width: 445px;
   border: solid 6px #7ed957;
+  position: relative;
 }
 
 .king{
@@ -201,4 +202,16 @@
 
 .move-icon{
   margin-right: 15px;
+  position: absolute;
+  top: 232px;
+  left: 421px;
+}
+
+.sold-out-message{
+  color: #ff6c69;
+  margin-left: 15px;
+}
+
+.fix-tool-tip{
+  white-space: pre-line !important;
 }
