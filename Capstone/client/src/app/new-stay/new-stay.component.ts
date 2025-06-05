@@ -81,14 +81,16 @@ export class NewStayComponent implements OnInit
   }
 
   readonly minDate = new Date();
-  readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDay());
-  readonly checkOutMinDate = new Date(this.minDate.getFullYear(), this.minDate.getMonth(), this.minDate.getDay() + 1);
-//better date validation because dates are annoiyigngjka
+  readonly maxDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDate());
+
+
+  minCheckoutDate = new Date();
+  maxCheckoutDate = new Date(this.minDate.getFullYear() + 1, this.minDate.getMonth(), this.minDate.getDate() +1);
+
   king?: boolean | null = null;
 
   canceledStay?: boolean | null = null;
 
-  assignedRoom?: number | null = null;
 
   toolTipMessage: string = "Your broken down total rate is: \n";
   //and for some reason it's not putting the stuff on new lines every time. does it need to be a for loop???
@@ -99,8 +101,6 @@ export class NewStayComponent implements OnInit
   availableKingsCount: number = 0;
   availableQueensCount: number = 0;
   totalAvailabilityCount: number = 0;
-
-  availability!: Availability;
 
 
   newStayForm = new FormGroup({
@@ -161,9 +161,6 @@ export class NewStayComponent implements OnInit
         this.creditCardInfoFormGroup.get("creditCardNum")?.setValue(abstractedNumbers, {emitEvent: false});
       }
     });
-
-
-    //can we make it so if the email address or phone number matches an entry in the database, it populates the other stuff??
 
     if (this.loginService.employee === undefined)
     {
@@ -306,13 +303,19 @@ formatDates(date:Date)
 }
   pickMyDates(event?: MatDatepickerInputEvent<Date>)
   {
+
+
     this.totalCost = 0;
     this.ratesArray = [];
-    if (this.newStayForm.get("checkInDate"))
+    if (this.newStayForm.get("checkInDate") && this.newStayForm.get("checkInDate")!.value)
     {
       const checkInDateExists = this.newStayForm.get("checkInDate")!.value ? new Date(this.newStayForm.get("checkInDate")!.value!) : new Date();
       const checkOutDateExists = event ? new Date(event.value!) : new Date(this.newStayForm.get("checkOutDate")!.value!);
 
+
+      this.minCheckoutDate = new Date(checkInDateExists.getFullYear(), checkInDateExists.getMonth(), checkInDateExists.getDate()+1);
+
+      this.maxCheckoutDate = new Date(this.minCheckoutDate.getFullYear() + 1, this.minCheckoutDate.getMonth(), this.minCheckoutDate.getDate());
 
       if ((this.newStayForm.get("checkInDate")?.valid && this.newStayForm.get("checkOutDate")?.valid)
         || this.newStayForm.get("checkInDate")?.disabled && this.newStayForm.get("checkOutDate")?.valid
@@ -326,7 +329,6 @@ formatDates(date:Date)
           this.ratesArray.forEach(rate =>
           {
             this.totalCost += +rate.ratePricePrice;
-            //TODO format this better
             this.toolTipMessage += `${this.formatDates(new Date(rate.rateDate))}: $${rate.ratePricePrice} \n`;
           });
         });

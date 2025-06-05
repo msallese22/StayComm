@@ -50,7 +50,7 @@
         </div>
         <mat-form-field>
           <mat-label>Check Out Date</mat-label>
-          <input matInput [min]="checkOutMinDate" [max]="maxDate" [matDatepicker]="checkOutPicker"
+          <input matInput [min]="minCheckoutDate" [max]="maxCheckoutDate" [matDatepicker]="checkOutPicker"
                  formControlName="checkOutDate" required (dateChange)="pickMyDates($event)"/>
           <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
           <mat-datepicker #checkOutPicker></mat-datepicker>

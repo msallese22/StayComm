@@ -13,14 +13,16 @@ import {RatePrice} from "./entities/rate-price";
 
 const AppDataSource = new DataSource({
     type: 'mysql',
-    host: 'localhost',
+    host: 'sallese03staycomm.mysql.database.azure.com',
     port: 3306,
-    username: 'michaela',
-    password: 'IT243Pwd!',
+    username: 'msallese01',
+    password: 'Shiny!613',
     database: 'StayComm',
     synchronize: false,
     logging: true,
     entities: [Guest, Stay, Property, Room, CreditCard, Employee, RatePrice],
     subscribers: [],
-    migrations: []
+    migrations: [],
+    ssl: {rejectUnauthorized: false}
+
 });
