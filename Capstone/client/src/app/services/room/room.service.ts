@@ -10,7 +10,7 @@ import {Availability} from '../../models/availability';
 export class RoomService {
 
   currentRoom!:Room;
-  private url = '/api';
+  private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 
   getRoomList()

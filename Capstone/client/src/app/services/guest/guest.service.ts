@@ -6,7 +6,7 @@ import {Guest} from '../../models/guest-interface';
   providedIn: 'root'
 })
 export class GuestService {
-  private url = '/api';
+  private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 
   getGuestById(id:number)

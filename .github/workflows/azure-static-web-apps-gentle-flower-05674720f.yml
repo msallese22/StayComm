@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - ms-branch1
-    paths:
-      - Capstone/client
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:

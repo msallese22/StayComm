@@ -15,7 +15,7 @@ export class StayService {
   currentStay!:StayInfo;
   currentCreditCardInfo?: CreditCard;
   availability!:Availability;
-  private url = '/api';
+  private url = 'http://localhost:3000';
   constructor(private http:HttpClient) {}
 
   getDepartureCount(): Observable<number>
