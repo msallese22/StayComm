@@ -19,7 +19,7 @@ export class LoginService {
   //subsnirbing lets you get the most recent data. don't forget to like and comment.
   isEmployee = this._isEmployee.asObservable();
 
-  private url = 'http://localhost:3000';
+  private url = '/api';
 
 
   constructor(private http:HttpClient) { }
