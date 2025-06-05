@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - ms-branch1
+    paths:
+      - Capstone/api
   workflow_dispatch:
 
 jobs:
